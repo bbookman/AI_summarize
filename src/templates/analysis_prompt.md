@@ -9,7 +9,6 @@ You will be provided with two supplemental documents:
 
 **Bee File Format:**
 
-- **File heading:** YYYY-MM-DD
 - **High-level summaries:** Denoted by `#` markdown for each conversation segment.
 - **Conversation details:**
   - _Conversation ID:_ Prefixed with "Conversation ID:"
@@ -103,7 +102,6 @@ You will be provided with two supplemental documents:
 
 ### Output Format
 
-- **File Heading:** YYYY-MM-DD
 - **High-Level Day Summary:**
   - Denoted by `#` markdown.
   - Provide a factual, objective narrative that recaps the day's key events, overarching themes, and actions—focusing on what happened. \*Be concise and keep it to a maximum of 4 sentences
