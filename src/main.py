@@ -4,6 +4,7 @@ def main():
     from services.summarizer import Summarizer
     import os
     import glob
+    import datetime
 
     print("\n=== Starting AI Summarizer ===")
     
@@ -39,6 +40,12 @@ def main():
             all_dates.add(date)
         else:
             print(f"⚠️ Could not extract date from file: {file}")
+
+    # Exclude today's date
+    today_str = datetime.date.today().strftime("%Y-%m-%d")
+    if today_str in all_dates:
+        print(f"Skipping files dated today: {today_str}")
+        all_dates.remove(today_str)
 
     if not all_dates:
         print("❌ No valid dates found in files")

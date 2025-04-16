@@ -1,58 +1,60 @@
-# README.md
-
-# Python Directory Reader
+# AI Summarize: Python Directory Reader
 
 ## Overview
 
-The Python Directory Reader is a simple application designed to read data from multiple specified directories. It utilizes a configuration file to determine the paths of the directories from which it will read data.
+AI Summarize is a Python application that reads daily conversation data from two sources ("Bee" and "Limitless"), along with supplemental facts and error files, and generates a high-quality, markdown-formatted summary for each date using OpenAI. The app is highly configurable and designed for robust, automated summarization workflows.
 
 ## Features
 
-- Reads data from four specified directories:
-  - BEE_DATA
-  - LIMITLESS_DATA
-  - FACTS
-  - ERRORS
-- Configurable directory paths through a JSON configuration file.
-- Modular design with separate files for configuration, directory reading, and utility functions.
+- Reads daily data files from Bee and Limitless directories.
+- Integrates supplemental facts and known errors into the analysis.
+- Uses OpenAI to generate a "Best of Class" summary for each date.
+- Outputs one markdown summary file per date, named as `YYYY-MM-DD.md`.
+- Handles missing data gracefully (processes even if only one source is present).
+- All directory paths and OpenAI settings are configurable via `config/config.json`.
 
 ## Project Structure
 
 ```
 python-directory-reader
-├── src
+├── src/
 │   ├── main.py
 │   ├── config.py
 │   ├── directory_reader.py
-│   └── utils
-│       ├── __init__.py
-│       └── file_handler.py
-├── config
-│   └── directories.json
-├── tests
-│   ├── __init__.py
+│   ├── services/
+│   │   └── summarizer.py
+│   ├── templates/
+│   │   └── analysis_prompt.md
+│   └── utils/
+│       ├── file_handler.py
+│       └── openai_handler.py
+├── config/
+│   └── config.json
+├── tests/
 │   ├── test_directory_reader.py
 │   └── test_file_handler.py
 ├── requirements.txt
-├── .gitignore
 └── README.md
 ```
 
 ## Installation
 
-To install the required dependencies, run:
-
-```
-pip install -r requirements.txt
-```
+1. Clone the repository.
+2. Install dependencies:
+   ```
+   pip install -r requirements.txt
+   ```
+3. Edit `config/config.json` to set your data directories and OpenAI API key.
 
 ## Usage
 
-To run the application, execute the following command:
+Run the summarizer with:
 
 ```
 python src/main.py
 ```
+
+Summaries will be saved in the directory specified by `OUTPUT_DIR` in your config.
 
 Ensure that the `directories.json` file is properly configured with the correct paths for the directories you wish to read from.
 
