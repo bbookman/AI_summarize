@@ -1,6 +1,6 @@
 # AI Summarize: Python Directory Reader
 
-## Overview
+## Overviewgit
 
 AI Summarize is a Python application that reads daily conversation data from two sources ("Bee" and "Limitless"), along with supplemental facts and error files, and generates a high-quality, markdown-formatted summary for each date using OpenAI. The app is highly configurable and designed for robust, automated summarization workflows.
 
@@ -12,6 +12,7 @@ AI Summarize is a Python application that reads daily conversation data from two
 - Outputs one markdown summary file per date, named as `YYYY-MM-DD.md`.
 - Handles missing data gracefully (processes even if only one source is present).
 - All directory paths and OpenAI settings are configurable via `config/config.json`.
+- Modify analysis_prompt.md to customize the analysis prompt.
 
 ## Project Structure
 
