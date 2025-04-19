@@ -5,13 +5,70 @@ def main():
     import os
     import glob
     import datetime
+    import shutil
+    import calendar
+    import re
 
     print("\n=== Starting AI Summarizer ===")
     
     print("\nLoading configuration...")
     config = load_config()
     print("✓ Configuration loaded")
+    
+    print("\nOrganizing directory structure...")
+    
+    def organize_directory(directory_path):
+        # Get only files at the root level that need organization
+        root_files = [f for f in os.listdir(directory_path) 
+                  if os.path.isfile(os.path.join(directory_path, f))]
+        
+        if not root_files:
+            return 0  # No files need organizing
+        
+        # Pattern to extract date from filenames (assuming YYYY-MM-DD format)
+        date_pattern = re.compile(r'(\d{4})-(\d{2})-\d{2}')
+        
+        organized_count = 0
+        for file in root_files:
+            match = date_pattern.search(file)
+            if match:
+                year, month_num = match.groups()
+                # Convert month number to name
+                month_name = calendar.month_name[int(month_num)]
+                
+                # Create year directory if it doesn't exist
+                year_dir = os.path.join(directory_path, year)
+                os.makedirs(year_dir, exist_ok=True)
+                
+                # Create month directory if it doesn't exist
+                month_dir = os.path.join(year_dir, month_name)
+                os.makedirs(month_dir, exist_ok=True)
+                
+                # Move the file to the appropriate directory
+                source_path = os.path.join(directory_path, file)
+                target_path = os.path.join(month_dir, file)
+                
+                # Only move if file isn't already in the correct location
+                if source_path != target_path:
+                    shutil.move(source_path, target_path)
+                    organized_count += 1
+        
+        return organized_count
 
+    # Check if organization is needed before running
+    bee_root_files = [f for f in os.listdir(config['BEE_DATA']) 
+                    if os.path.isfile(os.path.join(config['BEE_DATA'], f))]
+    limitless_root_files = [f for f in os.listdir(config['LIMITLESS_DATA']) 
+                          if os.path.isfile(os.path.join(config['LIMITLESS_DATA'], f))]
+
+    if bee_root_files or limitless_root_files:
+        print("\nOrganizing new files found in root directories...")
+        bee_organized = organize_directory(config['BEE_DATA'])
+        limitless_organized = organize_directory(config['LIMITLESS_DATA'])
+        print(f"✓ Organized {bee_organized} BEE files and {limitless_organized} LIMITLESS files")
+    else:
+        print("\nNo new files to organize in root directories")
+    
     print("\nInitializing services...")
     # Ensure OUTPUT_DIR exists
     os.makedirs(config['OUTPUT_DIR'], exist_ok=True)

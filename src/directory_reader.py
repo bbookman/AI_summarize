@@ -39,10 +39,18 @@ class DirectoryReader:
         return None
 
     def _get_files(self, directory):
-        """Gets a list of files in the given directory."""
+        """Gets a list of files recursively from the given directory and its subdirectories."""
         try:
-            return [os.path.join(directory, f) for f in os.listdir(directory) if os.path.isfile(os.path.join(directory, f))]
+            all_files = []
+            # Walk through directory tree
+            for root, dirs, files in os.walk(directory):
+                for file in files:
+                    # Add full path to each file
+                    file_path = os.path.join(root, file)
+                    all_files.append(file_path)
+            return all_files
         except FileNotFoundError:
+            print(f"Directory not found: {directory}")
             return []
 
     def _extract_date(self, file_path):
