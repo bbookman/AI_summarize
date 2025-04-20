@@ -24,19 +24,38 @@ class DirectoryReader:
 
     def read_bee_data_for_date(self, date):
         """Read bee data for a specific date."""
+        # Find files matching the date pattern
         bee_files = self.get_bee_files()
+        matching_files = []
+        
         for file in bee_files:
-            if date in file:
-                return read_file(file)
-        return None
+            file_date = self.extract_date_from_filename(file)
+            if file_date == date:
+                matching_files.append(file)
+        
+        if not matching_files:
+            print(f"No BEE data found for {date}")
+            return None
+        
+        # Read and combine the content
+        combined_content = ""
+        for file in matching_files:
+            try:
+                with open(file, 'r', encoding='utf-8') as f:
+                    content = f.read()
+                    # Truncate extremely large files if needed
+                    if len(content) > 30000:  # Arbitrary limit to prevent context explosion
+                        print(f"⚠️ Truncating large BEE file: {file}")
+                        content = content[:30000] + "\n...[content truncated due to size]..."
+                    combined_content += f"\n\n--- File: {os.path.basename(file)} ---\n{content}"
+            except Exception as e:
+                print(f"Error reading {file}: {e}")
+        
+        return combined_content
 
     def read_limitless_data_for_date(self, date):
         """Read limitless data for a specific date."""
-        limitless_files = self.get_limitless_files()
-        for file in limitless_files:
-            if date in file:
-                return read_file(file)
-        return None
+        # Same pattern as above but for limitless files
 
     def _get_files(self, directory):
         """Gets a list of files recursively from the given directory and its subdirectories."""

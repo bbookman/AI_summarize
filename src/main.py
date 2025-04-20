@@ -130,6 +130,12 @@ def main():
 
     print(f"\nFound {len(all_dates)} dates to process: {', '.join(all_dates)}")
 
+    # In main.py, before processing dates, read the facts and errors:
+    print("\nReading facts and errors...")
+    facts = reader.read_facts()
+    errors = reader.read_errors()
+    print("✓ Facts and errors loaded")
+
     # Now process only these 5 days
     for date in all_dates:
         print(f"\nProcessing data for {date}...")
@@ -144,7 +150,7 @@ def main():
             continue
         
         # Process the data
-        if summarizer.process_all(bee_data, limitless_data, None, None, date):
+        if summarizer.process_all(bee_data, limitless_data, facts, errors, date):
             processed_count += 1
         else:
             failed_count += 1
