@@ -1,11 +1,48 @@
+import time
+import random
 from openai import OpenAI
+# Update the error imports for newer OpenAI SDK versions
+from openai import APIError, APIConnectionError, RateLimitError
 
 class OpenAIHandler:
     def __init__(self, config):
         self.client = OpenAI(api_key=config['OPENAI_API_KEY'])
         self.model = config['OPEN_AI_MODEL']
-        self.prompt_template_path = config['PROMPT_TEMPLATE_PATH']
-        print(f"Initialized OpenAI handler with model: {self.model}")
+        # If you have a prompt template path in your config, add this:
+        self.prompt_template_path = config.get('PROMPT_TEMPLATE_PATH', '')
+        
+    def generate_text(self, prompt, max_retries=3):
+        """Generate text with retries for connection issues"""
+        attempt = 0
+        while attempt < max_retries:
+            try:
+                response = self.client.chat.completions.create(
+                    model=self.model,
+                    messages=[{"role": "user", "content": prompt}],
+                    temperature=0.7,
+                )
+                return response.choices[0].message.content
+            except (APIError, APIConnectionError) as e:
+                attempt += 1
+                if attempt >= max_retries:
+                    print(f"Failed after {max_retries} attempts: {str(e)}")
+                    return None
+                    
+                # Exponential backoff with jitter
+                sleep_time = (2 ** attempt) + random.uniform(0, 1)
+                print(f"Connection error: {str(e)}. Retrying in {sleep_time:.2f} seconds...")
+                time.sleep(sleep_time)
+            except RateLimitError:
+                # Special handling for rate limits
+                sleep_time = 20 + random.uniform(0, 10)
+                print(f"Rate limit exceeded. Waiting {sleep_time:.2f} seconds...")
+                time.sleep(sleep_time)
+                attempt += 1
+            except Exception as e:
+                print(f"Unexpected error: {str(e)}")
+                return None
+                
+        return None
 
     def load_prompt_template(self):
         """Load the prompt template from the specified path."""

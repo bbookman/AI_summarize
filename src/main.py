@@ -61,11 +61,17 @@ def main():
     limitless_root_files = [f for f in os.listdir(config['LIMITLESS_DATA']) 
                           if os.path.isfile(os.path.join(config['LIMITLESS_DATA'], f))]
 
-    if bee_root_files or limitless_root_files:
+    # Create OUTPUT_DIR if it doesn't exist
+    os.makedirs(config['OUTPUT_DIR'], exist_ok=True)
+    output_root_files = [f for f in os.listdir(config['OUTPUT_DIR']) 
+                       if os.path.isfile(os.path.join(config['OUTPUT_DIR'], f))]
+
+    if bee_root_files or limitless_root_files or output_root_files:
         print("\nOrganizing new files found in root directories...")
         bee_organized = organize_directory(config['BEE_DATA'])
         limitless_organized = organize_directory(config['LIMITLESS_DATA'])
-        print(f"✓ Organized {bee_organized} BEE files and {limitless_organized} LIMITLESS files")
+        output_organized = organize_directory(config['OUTPUT_DIR'])
+        print(f"✓ Organized {bee_organized} BEE files, {limitless_organized} LIMITLESS files, and {output_organized} OUTPUT files")
     else:
         print("\nNo new files to organize in root directories")
     
