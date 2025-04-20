@@ -116,21 +116,35 @@ def main():
 
     print(f"\nFound {len(all_dates)} unique dates to process")
     
-    for date in sorted(all_dates):
+    # Convert to list and sort (newest first)
+    all_dates = sorted(list(all_dates), reverse=True)
+
+    # TEMPORARY: Limit to 5 most recent days
+    if len(all_dates) > 5:
+        skipped_dates = len(all_dates) - 5
+        all_dates = all_dates[:5]  # Take only the 5 most recent dates
+        print(f"\n⚠️ LIMITING TO 5 MOST RECENT DAYS - Skipping {skipped_dates} older dates ⚠️")
+
+    # Reverse back to chronological order for processing
+    all_dates.sort()  
+
+    print(f"\nFound {len(all_dates)} dates to process: {', '.join(all_dates)}")
+
+    # Now process only these 5 days
+    for date in all_dates:
         print(f"\nProcessing data for {date}...")
+        
+        # Read the data for this date
         bee_data = reader.read_bee_data_for_date(date)
         limitless_data = reader.read_limitless_data_for_date(date)
-
-        # Only process if at least one of bee_data or limitless_data is present
+        
+        # Skip this date if we don't have data
         if not bee_data and not limitless_data:
-            print(f"⚠️ No data found for date: {date}")
-            failed_count += 1
+            print(f"⚠️ No data found for {date}, skipping...")
             continue
-
-        facts = reader.read_facts()
-        errors = reader.read_errors()
-
-        if summarizer.process_all(bee_data, limitless_data, facts, errors, date):
+        
+        # Process the data
+        if summarizer.process_all(bee_data, limitless_data, None, None, date):
             processed_count += 1
         else:
             failed_count += 1

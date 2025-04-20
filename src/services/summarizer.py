@@ -100,7 +100,7 @@ class Summarizer:
             insight_filename = f"{date}-insight.md"
             output_path = os.path.join(self.config['OUTPUT_DIR'], insight_filename)
             
-            # Save the insights to file (no markdown formatting)
+            # Save the insights to file
             with open(output_path, 'w') as file:
                 file.write(insights)
             
