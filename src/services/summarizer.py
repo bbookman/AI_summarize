@@ -75,3 +75,47 @@ class Summarizer:
         except Exception as e:
             print(f"❌ Error generating summary: {e}")
             return False
+
+    def generate_insights(self, date, bee_data, limitless_data, facts=None):
+        """Generate insights using the INSIGHT_PROMPT template."""
+        print(f"\nGenerating insights for {date}...")
+        
+        # Load the insight prompt template
+        with open(self.config['INSIGHT_PROMPT'], 'r') as file:
+            template = file.read()
+        
+        # Prepare the prompt with data
+        prompt = template.format(
+            date=date,
+            bee_conversation=bee_data if bee_data else "No data available",
+            limitless_conversation=limitless_data if limitless_data else "No data available",
+            facts=facts if facts else "No additional facts available"
+        )
+        
+        # Generate the insights using OpenAI
+        insights = self.openai.generate_text(prompt)
+        
+        if insights:
+            # Create the insight filename with pattern YYYY-MM-DD-insight.md
+            insight_filename = f"{date}-insight.md"
+            output_path = os.path.join(self.config['OUTPUT_DIR'], insight_filename)
+            
+            # Save the insights to file (no markdown formatting)
+            with open(output_path, 'w') as file:
+                file.write(insights)
+            
+            print(f"✓ Insights for {date} saved to {insight_filename}")
+            return True
+        else:
+            print(f"❌ Failed to generate insights for {date}")
+            return False
+
+    def process_date(self, date, bee_data, limitless_data, facts=None):
+        """Process data for a specific date to generate both journal and insights."""
+        # Generate the journal entry (assuming this already exists)
+        journal_success = self.generate_journal(date, bee_data, limitless_data, facts)
+        
+        # Generate the insights
+        insight_success = self.generate_insights(date, bee_data, limitless_data, facts)
+        
+        return journal_success and insight_success

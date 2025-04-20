@@ -17,6 +17,10 @@ You will be provided with two supplemental documents:
   - **Second-level summaries:** Denoted by `##` markdown.
   - **Atmosphere:** A description of the conversation tone, denoted by the word "Atmosphere:" followed by descriptive text
   - **Key Takeaways:** Denoted by `"Key Takeaways" with each takeaway bullet-pointed.
+  - **Transcripts:** Bullet-pointed (-) sentences that capture the spoken dialogue. These include a speaker tag and the spoken words. Examples:
+  - Speaker 2: I would make myself a perfect.
+  - Speaker 1: Open, I'm hearing all right.
+  - **Facts:** Bullet-pointed (-) sentences that capture factual information.
 
 **Limitless File Format:**
 
@@ -86,11 +90,7 @@ You will be provided with two supplemental documents:
    - If there are no key takeaways derived from the data, omit this section entirely.
 
 7. **Unique Sections:**
-
-   - Reframe any unique sections from either dataset to align with overall themes.
-   - Format according to the specific content requirements.
-   - Provide a bulleted list of each unique summary. Note the source, either bee or limitless.
-   - If there are no unique sections, omit this section entirely.
+   Identify unique subsections from each set of data (Bee and Limitless)
 
 ### Source Data for Analysis
 
@@ -117,9 +117,12 @@ You will be provided with two supplemental documents:
   - Only include this section if there is at least one key takeaway.
 
 - **Unique Sections:**
-  - Reframe any unique sections from either dataset to align with overall themes.
-  - Format according to the specific content requirements.
-  - Provide a bulleted list of each unique summary. Note the source, either bee or limitless.
+  If both Bee and Limitless data are provided, include the following. Otherwise, omit this section.
+  - Denoted by `## Unique Section`.
+  - Heading "#### Bee Unique Sections"
+    - Bullet point list of section titles unique to bee
+  - Heading "#### Limitless Unique Sections"
+    - Bullet point list of section titles unique to limitless
 
 ### Final Note
 

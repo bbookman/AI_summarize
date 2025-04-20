@@ -9,7 +9,7 @@ class OpenAIHandler:
         self.client = OpenAI(api_key=config['OPENAI_API_KEY'])
         self.model = config['OPEN_AI_MODEL']
         # If you have a prompt template path in your config, add this:
-        self.prompt_template_path = config.get('PROMPT_TEMPLATE_PATH', '')
+        self.prompt_template_path = config.get('JOURNAL_PROMPT', '')
         
     def generate_text(self, prompt, max_retries=3):
         """Generate text with retries for connection issues"""
