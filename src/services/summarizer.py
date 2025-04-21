@@ -8,13 +8,13 @@ class Summarizer:
     
     def __init__(self, config):
         """Initialize summarizer with configuration."""
-        print("\nInitializing Summarizer...")
+        # print("\nInitializing Summarizer...")
         self.openai = OpenAIHandler(config)
         self.config = config  # Store the entire config object
         self.output_dir = config.get('OUTPUT_DIR')
         if not self.output_dir:
             raise ValueError("OUTPUT_DIR not configured")
-        print("✓ Summarizer initialized")
+        # print("✓ Summarizer initialized")
 
     def save_summary(self, summary, date=None, suffix=""):
         """Save summary with YYYY-MM-DD format filename, with optional suffix"""
@@ -43,7 +43,7 @@ class Summarizer:
         """Generate a journal entry using the JOURNAL_PROMPT template."""
         print(f"\nGenerating journal for {date}...")
 
-        # Load prompt template
+        # 1. Load the journal prompt template
         try:
             with open(self.config['JOURNAL_PROMPT'], 'r') as file:
                 template = file.read()
@@ -51,18 +51,17 @@ class Summarizer:
             print(f"❌ Failed to load journal prompt template: {e}")
             return False
 
-        # Format the prompt with data - UPDATED PARAMETER NAMES TO MATCH TEMPLATE
-        formatted_prompt = template.format(
-            date=date,
+        # 2. Format the prompt with data
+        prompt = template.format(
             BEE_CONTENT=bee_data if bee_data else "No data available",
             LIMITLESS_CONTENT=limitless_data if limitless_data else "No data available",
             FACTS_CONTENT=facts if facts else "No additional facts available",
-            ERRORS_CONTENT=errors if errors else "No errors noted"
+            ERRORS_CONTENT=errors if errors else "No known errors"
         )
 
-        # Get response from OpenAI
-        journal = self.openai.generate_text(formatted_prompt)
-        
+        # 3. Generate the journal using OpenAI
+        journal = self.openai.generate_text(prompt)
+
         if journal:
             # Save the journal with the specific date
             filepath = self.save_summary(journal, date)
@@ -75,27 +74,37 @@ class Summarizer:
     def generate_insights(self, date, bee_data, limitless_data, facts=None, errors=None):
         """Generate insights using the INSIGHT_PROMPT template."""
         print(f"\nGenerating insights for {date}...")
-        
-        # Load the insight prompt template
+
+        # 1. Load the insight prompt template
         try:
+            # Debug: Check if the file exists
+            if os.path.exists(self.config['INSIGHT_PROMPT']):
+                print(f"✓ INSIGHT_PROMPT file found at: {self.config['INSIGHT_PROMPT']}")
+            else:
+                print(f"❌ INSIGHT_PROMPT file NOT FOUND at: {self.config['INSIGHT_PROMPT']}")
+
             with open(self.config['INSIGHT_PROMPT'], 'r') as file:
                 template = file.read()
+            # print(f"✓ Loaded insight prompt template ({len(template)} chars)")  # Debug
         except Exception as e:
             print(f"❌ Failed to load insight prompt template: {e}")
             return False
-        
-        # Prepare the prompt with data
+
+        # 2. Format the prompt with data
         prompt = template.format(
             BEE_CONTENT=bee_data if bee_data else "No data available",
             LIMITLESS_CONTENT=limitless_data if limitless_data else "No data available",
             FACTS_CONTENT=facts if facts else "No additional facts available",
             ERRORS_CONTENT=errors if errors else "No known errors"
         )
-        
-        # Generate the insights using OpenAI
+        # print(f"Formatted prompt (length: {len(prompt)} chars):")  # Debug
+        print(prompt[:10])  # Debug - Print the entire prompt
+
+        # 3. Generate the insights using OpenAI
         insights = self.openai.generate_text(prompt)
-        
+
         if insights:
+            # print(f"✓ Successfully generated insights (length: {len(insights)} chars)")  # Debug
             # Create the insight filename with pattern YYYY-MM-DD-insight.md
             filepath = self.save_summary(insights, date, suffix="-insight")
             print(f"✓ Insights saved to: {filepath}")
@@ -137,8 +146,14 @@ class Summarizer:
             print(f"❌ Error in process_all: {e}")
             return False
 
-    def generate_text(self, prompt, max_retries=3):
+    def generate_text(self, template, bee_content="", limitless_content="", facts_content="", errors_content=""):
         """Generate text with retries for connection issues"""
+        prompt = template.format(
+            BEE_CONTENT=bee_content if bee_content else "No data available",
+            LIMITLESS_CONTENT=limitless_content if limitless_content else "No data available",
+            FACTS_CONTENT=facts_content if facts_content else "No additional facts available",
+            ERRORS_CONTENT=errors_content if errors_content else "No known errors"
+        )
         attempt = 0
         while attempt < max_retries:
             try:
@@ -149,25 +164,14 @@ class Summarizer:
                 )
                 return response.choices[0].message.content
             except (APIError, APIConnectionError) as e:
-                error_str = str(e)
-                
-                # Check specifically for context length exceeded error
-                if "context_length_exceeded" in error_str or "maximum context length" in error_str:
-                    print(f"\n❌ FATAL ERROR: The prompt is too large for the model's context window:")
-                    print(f"   {error_str}")
-                    print(f"\nThe application will now terminate. Please reduce the amount of data being processed.")
-                    import sys
-                    sys.exit(1)  # Exit with error code
-                    
-                # Handle other API errors with retry
                 attempt += 1
                 if attempt >= max_retries:
-                    print(f"Failed after {max_retries} attempts: {error_str}")
+                    print(f"Failed after {max_retries} attempts: {str(e)}")
                     return None
                     
                 # Exponential backoff with jitter
                 sleep_time = (2 ** attempt) + random.uniform(0, 1)
-                print(f"Connection error: {error_str}. Retrying in {sleep_time:.2f} seconds...")
+                print(f"Connection error: {str(e)}. Retrying in {sleep_time:.2f} seconds...")
                 time.sleep(sleep_time)
             except RateLimitError:
                 # Special handling for rate limits
@@ -178,5 +182,5 @@ class Summarizer:
             except Exception as e:
                 print(f"Unexpected error: {str(e)}")
                 return None
-                
-        return None
+                    
+            return None

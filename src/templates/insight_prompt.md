@@ -1,8 +1,10 @@
-Analyze the following lifelog data provided below. Break it down into key behavioral patterns, recurring themes, daily routines, conversational tone, mood indicators, productivity trends, and any anomalies or significant events. Categorize the data by time, context (work, family, personal development, health), and suggest what deeper insights can be derived about my habits, mindset, decision-making, and emotional state. Also highlight anything I may be overlooking that could help me improve performance, relationships, or wellbeing. Present it in a structured summary with bullet points, timelines, and recommendations. Based on this analysis, what would a digital assistant trained on this data prioritize or optimize in my day-to-day life?"
+Review the conversations and summaries. Consider also a set of facts and errors.
 
-### Source Data for Analysis
+Provide me with a witty or insightful take on the information. Suprise me.
 
-**Bee Data:**
+Generate some interesting statistics such as percentage of conversations that were confrontational versus collaborative. And determine an overall daily mood - happy, sad, angry, etc.
+
+\*Bee Data:\*\*
 {BEE_CONTENT}
 
 **Limitless Data:**

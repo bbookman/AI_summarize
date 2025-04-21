@@ -8,8 +8,11 @@ class OpenAIHandler:
     def __init__(self, config):
         self.client = OpenAI(api_key=config['OPENAI_API_KEY'])
         self.model = config['OPEN_AI_MODEL']
-        # If you have a prompt template path in your config, add this:
-        self.prompt_template_path = config.get('JOURNAL_PROMPT', '')
+        # Load prompt templates during initialization
+        self.journal_prompt_path = config.get('JOURNAL_PROMPT', '')
+        self.insight_prompt_path = config.get('INSIGHT_PROMPT', '')
+        self.journal_template = self._load_prompt_template(self.journal_prompt_path)
+        self.insight_template = self._load_prompt_template(self.insight_prompt_path)
         
     def generate_text(self, prompt, max_retries=3):
         """Generate text with retries for connection issues"""
@@ -44,11 +47,11 @@ class OpenAIHandler:
                 
         return None
 
-    def load_prompt_template(self):
+    def _load_prompt_template(self, path):
         """Load the prompt template from the specified path."""
-        print(f"\nLoading prompt template from: {self.prompt_template_path}")
+        print(f"\nLoading prompt template from: {path}")
         try:
-            with open(self.prompt_template_path, 'r') as file:
+            with open(path, 'r') as file:
                 template = file.read()
             print(f"✓ Loaded prompt template ({len(template)} chars)")
             return template

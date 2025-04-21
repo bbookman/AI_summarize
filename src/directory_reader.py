@@ -44,8 +44,10 @@ class DirectoryReader:
                 with open(file, 'r', encoding='utf-8') as f:
                     content = f.read()
                     # Truncate extremely large files if needed
+
                     if len(content) > 30000:  # Arbitrary limit to prevent context explosion
                         print(f"⚠️ Truncating large BEE file: {file}")
+                        print(f"File size: {len(content)} characters")
                         content = content[:30000] + "\n...[content truncated due to size]..."
                     combined_content += f"\n\n--- File: {os.path.basename(file)} ---\n{content}"
             except Exception as e:
