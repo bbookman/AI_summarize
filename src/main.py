@@ -8,12 +8,21 @@ def main():
     import shutil
     import calendar
     import re
+    import getpass  # For secure password input
 
     print("\n=== Starting AI Summarizer ===")
     
     print("\nLoading configuration...")
     config = load_config()
-    print("✓ Configuration loaded")
+    
+    # Prompt for OpenAI API key
+    print("\nPlease enter your OpenAI API key:")
+    api_key = getpass.getpass("API Key: ")
+    
+    # Add the API key to the config
+    config['OPENAI_API_KEY'] = api_key
+    
+    print("✓ Configuration loaded with API key")
     
     print("\nOrganizing directory structure...")
     
