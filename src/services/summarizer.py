@@ -71,57 +71,11 @@ class Summarizer:
             print(f"❌ Failed to generate journal for {date}")
             return False
 
-    def generate_insights(self, date, bee_data, limitless_data, facts=None, errors=None):
-        """Generate insights using the INSIGHT_PROMPT template."""
-        print(f"\nGenerating insights for {date}...")
-
-        # 1. Load the insight prompt template
-        try:
-            # Debug: Check if the file exists
-            if os.path.exists(self.config['INSIGHT_PROMPT']):
-                print(f"✓ INSIGHT_PROMPT file found at: {self.config['INSIGHT_PROMPT']}")
-            else:
-                print(f"❌ INSIGHT_PROMPT file NOT FOUND at: {self.config['INSIGHT_PROMPT']}")
-
-            with open(self.config['INSIGHT_PROMPT'], 'r') as file:
-                template = file.read()
-            # print(f"✓ Loaded insight prompt template ({len(template)} chars)")  # Debug
-        except Exception as e:
-            print(f"❌ Failed to load insight prompt template: {e}")
-            return False
-
-        # 2. Format the prompt with data
-        prompt = template.format(
-            BEE_CONTENT=bee_data if bee_data else "No data available",
-            LIMITLESS_CONTENT=limitless_data if limitless_data else "No data available",
-            FACTS_CONTENT=facts if facts else "No additional facts available",
-            ERRORS_CONTENT=errors if errors else "No known errors"
-        )
-        # print(f"Formatted prompt (length: {len(prompt)} chars):")  # Debug
-        # print(prompt[:10])  # Debug - Print the entire prompt
-
-        # 3. Generate the insights using OpenAI
-        insights = self.openai.generate_text(prompt)
-
-        if insights:
-            # print(f"✓ Successfully generated insights (length: {len(insights)} chars)")  # Debug
-            # Create the insight filename with pattern YYYY-MM-DD-insight.md
-            filepath = self.save_summary(insights, date, suffix="-insight")
-            print(f"✓ Insights saved to: {filepath}")
-            return True
-        else:
-            print(f"❌ Failed to generate insights for {date}")
-            return False
-
     def process_date(self, date, bee_data, limitless_data, facts=None, errors=None):
-        """Process data for a specific date to generate both journal and insights."""
+        """Process data for a specific date to generate journal."""
         # Generate the journal entry
         journal_success = self.generate_journal(date, bee_data, limitless_data, facts, errors)
-        
-        # Generate the insights
-        insight_success = self.generate_insights(date, bee_data, limitless_data, facts, errors)
-        
-        return journal_success and insight_success
+        return journal_success
 
     def process_all(self, bee_data, limitless_data, facts, errors, date):
         """Process data for a specific date (calls process_date)."""
@@ -132,7 +86,7 @@ class Summarizer:
                 print("❌ No date provided for processing")
                 return False
 
-            # Use the process_date method to handle both journal and insights
+            # Use the process_date method to handle journal generation
             success = self.process_date(date, bee_data, limitless_data, facts, errors)
             
             if success:
@@ -145,42 +99,3 @@ class Summarizer:
         except Exception as e:
             print(f"❌ Error in process_all: {e}")
             return False
-
-    def generate_text(self, template, bee_content="", limitless_content="", facts_content="", errors_content=""):
-        """Generate text with retries for connection issues"""
-        prompt = template.format(
-            BEE_CONTENT=bee_content if bee_content else "No data available",
-            LIMITLESS_CONTENT=limitless_content if limitless_content else "No data available",
-            FACTS_CONTENT=facts_content if facts_content else "No additional facts available",
-            ERRORS_CONTENT=errors_content if errors_content else "No known errors"
-        )
-        attempt = 0
-        while attempt < max_retries:
-            try:
-                response = self.client.chat.completions.create(
-                    model=self.model,
-                    messages=[{"role": "user", "content": prompt}],
-                    temperature=0.7,
-                )
-                return response.choices[0].message.content
-            except (APIError, APIConnectionError) as e:
-                attempt += 1
-                if attempt >= max_retries:
-                    print(f"Failed after {max_retries} attempts: {str(e)}")
-                    return None
-                    
-                # Exponential backoff with jitter
-                sleep_time = (2 ** attempt) + random.uniform(0, 1)
-                print(f"Connection error: {str(e)}. Retrying in {sleep_time:.2f} seconds...")
-                time.sleep(sleep_time)
-            except RateLimitError:
-                # Special handling for rate limits
-                sleep_time = 20 + random.uniform(0, 10)
-                print(f"Rate limit exceeded. Waiting {sleep_time:.2f} seconds...")
-                time.sleep(sleep_time)
-                attempt += 1
-            except Exception as e:
-                print(f"Unexpected error: {str(e)}")
-                return None
-                    
-            return None

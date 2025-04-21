@@ -8,11 +8,9 @@ class OpenAIHandler:
     def __init__(self, config):
         self.client = OpenAI(api_key=config['OPENAI_API_KEY'])
         self.model = config['OPEN_AI_MODEL']
-        # Load prompt templates during initialization
+        # Load journal prompt template during initialization
         self.journal_prompt_path = config.get('JOURNAL_PROMPT', '')
-        self.insight_prompt_path = config.get('INSIGHT_PROMPT', '')
         self.journal_template = self._load_prompt_template(self.journal_prompt_path)
-        self.insight_template = self._load_prompt_template(self.insight_prompt_path)
         
     def generate_text(self, prompt, max_retries=3):
         """Generate text with retries for connection issues"""
