@@ -98,7 +98,7 @@ class Summarizer:
             ERRORS_CONTENT=errors if errors else "No known errors"
         )
         # print(f"Formatted prompt (length: {len(prompt)} chars):")  # Debug
-        print(prompt[:10])  # Debug - Print the entire prompt
+        # print(prompt[:10])  # Debug - Print the entire prompt
 
         # 3. Generate the insights using OpenAI
         insights = self.openai.generate_text(prompt)
