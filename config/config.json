@@ -5,5 +5,5 @@
   "ERRORS": "/Users/brucebookman/bruce_vault/Conversations/errors",
   "OPEN_AI_MODEL": "gpt-4o-mini",
   "JOURNAL_PROMPT": "/Users/brucebookman/code/AI_summarize/python-directory-reader/src/templates/journal_prompt.md",
-  "OUTPUT_DIR": "/Users/brucebookman/bruce_vault/Conversations/journal_test"
+  "OUTPUT_DIR": "/Users/brucebookman/bruce_vault/Conversations/journal"
 }
