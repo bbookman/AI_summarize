@@ -2,6 +2,7 @@ import os
 from datetime import datetime
 from utils.openai_handler import OpenAIHandler
 from utils.file_handler import write_file
+import calendar # Added import
 
 class Summarizer:
     """Service to handle data reading and OpenAI summarization."""
@@ -17,27 +18,45 @@ class Summarizer:
         # print("✓ Summarizer initialized")
 
     def save_summary(self, summary, date=None, suffix=""):
-        """Save summary with YYYY-MM-DD format filename, with optional suffix"""
+        """Save summary with YYYY-MM-DD format filename, organized by year and month."""
         if not summary:
             raise ValueError("Summary content cannot be empty")
             
-        # Ensure we have a valid date
+        # Ensure we have a valid date string
         if not date:
-            date = datetime.now().strftime('%Y-%m-%d')
+            date_str = datetime.now().strftime('%Y-%m-%d')
+        else:
+            date_str = date # Assuming date is already a 'YYYY-MM-DD' string
+
+        try:
+            # Parse the date string to get year and month
+            date_obj = datetime.strptime(date_str, '%Y-%m-%d')
+            year = str(date_obj.year)
+            month_name = calendar.month_name[date_obj.month]
+        except ValueError:
+            print(f"❌ Invalid date format: {date_str}. Cannot organize by date.")
+            # Fallback to saving directly in OUTPUT_DIR
+            year = ""
+            month_name = ""
+
+        # Construct the target directory path
+        target_dir = self.output_dir
+        if year and month_name:
+            target_dir = os.path.join(self.output_dir, year, month_name)
         
-        # Create output directory if it doesn't exist
-        os.makedirs(self.output_dir, exist_ok=True)
+        # Create output directory structure if it doesn't exist
+        os.makedirs(target_dir, exist_ok=True)
         
         # Create filename in YYYY-MM-DD format with optional suffix
-        filename = f"{date}{suffix}.md"
-        filepath = os.path.join(self.output_dir, filename)
+        filename = f"{date_str}{suffix}.md"
+        filepath = os.path.join(target_dir, filename)
         
         try:
             with open(filepath, 'w', encoding='utf-8') as f:
                 f.write(summary)
             return filepath
         except Exception as e:
-            raise IOError(f"Failed to save summary: {e}")
+            raise IOError(f"Failed to save summary to {filepath}: {e}")
 
     def generate_journal(self, date, bee_data, limitless_data, facts=None, errors=None):
         """Generate a journal entry using the JOURNAL_PROMPT template."""
