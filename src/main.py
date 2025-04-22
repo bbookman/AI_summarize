@@ -20,7 +20,7 @@ def main():
     api_key = getpass.getpass("API Key: ")
     
     # Add the API key to the config
-    config['OPENAI_API_KEY'] = api_key
+    config['OPENAI_API_KEY'] = api_key  
     
     print("✓ Configuration loaded with API key")
     
@@ -127,12 +127,6 @@ def main():
     
     # Convert to list and sort (newest first)
     all_dates = sorted(list(all_dates), reverse=True)
-
-    # TEMPORARY: Limit to 5 most recent days
-    if len(all_dates) > 5:
-        skipped_dates = len(all_dates) - 5
-        all_dates = all_dates[:5]  # Take only the 5 most recent dates
-        print(f"\n⚠️ LIMITING TO 5 MOST RECENT DAYS - Skipping {skipped_dates} older dates ⚠️")
 
     # Reverse back to chronological order for processing
     all_dates.sort()  

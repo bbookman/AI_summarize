@@ -4,11 +4,13 @@ Facts: Verified supplemental information.
 
 Errors: Previously derived, incorrect details (to be disregarded).
 
-Objective: Generate a markdown document containing:
+Objective: Generate a markdown document
+
+NOTE: do not state the date in the document anyplace
 
 Summary of the day:
 
-A concise (max 4 sentences) factual recap of key events.
+A concise (max 6 sentences) first person recap of the day
 
 Sentiment Analysis:
 
@@ -16,15 +18,9 @@ Categorize overall mood as Good, Neutral, or Bad.
 
 Include a markdown table with sentiment percentages that total 100%.
 
-Atmosphere:
+Key Highlights:
 
-A brief tone/mood analysis (up to 4 sentences), using Bee’s "Atmosphere" data when available, supplemented by Limitless data if needed.
-
-Key Takeaways:
-
-Up to 5 bullet points (each under 10 words) summarizing actionable insights.
-
-Include this section only if at least one takeaway is present.
+Up to 7 bullet points highlighting significant moments, lessons learned, or notable occurrences.
 
 Guidelines:
 
