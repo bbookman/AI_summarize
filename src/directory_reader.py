@@ -21,6 +21,12 @@ try:
 except LookupError:
     nltk.download('punkt')
 
+# Download punkt_tab tokenizer if not already downloaded (sometimes needed)
+try:
+    nltk.data.find('tokenizers/punkt_tab')
+except LookupError:
+    nltk.download('punkt_tab')
+
 def _remove_stopwords(text):
     """Remove stop words from a given text."""
     if not text:
