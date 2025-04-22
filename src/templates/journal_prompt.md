@@ -7,6 +7,7 @@ Errors: Previously derived, incorrect details (to be disregarded).
 Objective: Generate a markdown document
 
 NOTE: do not state the date in the document anyplace
+NOTE: do not ever write the following to the file "```markdown"
 
 Summary of the day:
 A single line identifying the source data. Such as
@@ -29,14 +30,20 @@ Up to 5 bullet points highlighting birthdays, holidays, vacations, significant m
 
 Learnings:
 
-If any new procedure or processes were learned, explain them in a step-by-step numbered list. Otherwise skip this section.
+Identify only procedural content: Review the transcripts and summaries for any new methods, procedures, or processes that you learned during the day.
+
+Step-by-step format: If you identify a new procedure or process, outline it as a sequential, step-by-step numbered list. Each step should detail a specific action that contributes to completing the process.
+
+Exclude non-procedural insights: Do not include general observations, reflections, or abstract insights that are not organized as a clear process.
+
+Omit if irrelevant: If no new procedural content is found, skip this section entirely. No heading, no text
 
 Health Status:
-If the conversations or summaries indicate my health status, make a short statement.
+If the conversations or summaries indicate my health status, make a short statement. Ignore the facts supplementtal file. No general statements form this file are relevant.
 
 If health measurements were taken, include them in a markdown table.
 
-If no information is available, skip this section.
+If no information is available, skip this section entirely. No heading, no text
 
 Guidelines:
 
