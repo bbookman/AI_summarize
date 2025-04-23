@@ -3,6 +3,7 @@ from datetime import datetime
 from utils.openai_handler import OpenAIHandler
 from utils.file_handler import write_file
 import calendar # Added import
+import sys # Added import
 
 class Summarizer:
     """Service to handle data reading and OpenAI summarization."""
@@ -117,4 +118,5 @@ class Summarizer:
             
         except Exception as e:
             print(f"❌ Error in process_all: {e}")
-            return False
+            print("Exiting application due to error.")
+            sys.exit(1) # Exit the application with an error code

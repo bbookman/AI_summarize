@@ -2,7 +2,8 @@ import time
 import random
 from openai import OpenAI
 # Update the error imports for newer OpenAI SDK versions
-from openai import APIError, APIConnectionError, RateLimitError
+from openai import APIError, APIConnectionError, RateLimitError, AuthenticationError # Added AuthenticationError
+import sys # Added import
 
 class OpenAIHandler:
     def __init__(self, config):
@@ -23,15 +24,31 @@ class OpenAIHandler:
                     temperature=0.7,
                 )
                 return response.choices[0].message.content
+            except AuthenticationError as e: # Catch AuthenticationError specifically
+                print(f"\n❌ FATAL ERROR: OpenAI Authentication Failed (Invalid API Key?):")
+                print(f"   {str(e)}")
+                print(f"\nPlease check your API key and ensure it's valid and has permissions.")
+                print("Exiting application.")
+                sys.exit(1) # Exit the application
             except (APIError, APIConnectionError) as e:
+                error_str = str(e)
+                
+                # Check specifically for context length exceeded error
+                if "context_length_exceeded" in error_str or "maximum context length" in error_str:
+                    print(f"\n❌ FATAL ERROR: The prompt is too large for the model's context window:")
+                    print(f"   {error_str}")
+                    print(f"\nThe application will now terminate. Please reduce the amount of data being processed.")
+                    sys.exit(1)  # Exit with error code
+                    
+                # Handle other API errors with retry
                 attempt += 1
                 if attempt >= max_retries:
-                    print(f"Failed after {max_retries} attempts: {str(e)}")
+                    print(f"Failed after {max_retries} attempts: {error_str}")
                     return None
                     
                 # Exponential backoff with jitter
                 sleep_time = (2 ** attempt) + random.uniform(0, 1)
-                print(f"Connection error: {str(e)}. Retrying in {sleep_time:.2f} seconds...")
+                print(f"Connection error: {error_str}. Retrying in {sleep_time:.2f} seconds...")
                 time.sleep(sleep_time)
             except RateLimitError:
                 # Special handling for rate limits

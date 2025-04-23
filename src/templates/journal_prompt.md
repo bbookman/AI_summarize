@@ -6,7 +6,7 @@ Facts: Verified supplemental information.
 Errors: Previously derived, incorrect details (to be disregarded).
 
 Objective:
-Generate a markdown document.
+Generate a markdown document that captures the day's information
 
 Guidelines:
 
@@ -14,76 +14,76 @@ Do not include the date anywhere in the document.
 
 Never write the following in the file: ```markdown
 
-If both files are provided, prioritize Bee data.
+Do not generate the journal entry section if the day's transcript does not include a mention of journaling or the word journal.
+There may be more than one journal subject discussed. Create a paragraph for each subject.
+
+If no blood sugar, weight or steps count are described, do not include the Health Data section.
+
+Review the day data. If a medical consultation is not encountered, do not include the Medical Consultation section.
+Review the day data. If a psychological consultation is not encountered, do not include the Psychological Consultation section.
+
+If both Bee and Limitless files are provided, prioritize Bee data.
 
 Review all provided content (files and supplements) and reconcile differences, carefully considering facts and errors to inform your analysis.
 
-Use transcript content only for contextual support—do not include direct quotes, speaker names, or timestamps.
+Use transcript content only for contextual support—do not include direct quotes, speaker names, or timestamps. However, do note the word "journal" as this should trigger creating a journal section described below.
 
 Markdown Document Structure
-Summary of the Day:
-A single line identifying the source data. Example:
+START
 
-Source: Bee, Limitless
+# Summary of <Day name .. example Monday, Tuesday>:
 
-Source: Bee
+Single line identifying the sources of data Bee, Bee and Limitless, or Limitless.
 
-Source: Limitless
+first-person recap of the day
 
-A concise (maximum 6 sentences) first-person recap of the day. If any US holiday occurred, the family may have celebrated—note significant events or celebrations.
+## Sentiment Analysis:
 
-Sentiment Analysis:
-Categorize overall mood as Good, Neutral, or Bad.
+A single line measure of frustration level as High, Medium, or Low.
+A single line stating the highest sentiment. Example: Positive
 
-Measure frustration level as High, Medium, or Low.
+| Sentiment | % |
 
-Include a markdown table with sentiment percentages totaling 100%.
+| --- | --- |
+| Positive | percentage |
+| Neutral | percentage |
+| Negative | percentage |
 
-Key Highlights:
-Up to 5 bullet points highlighting birthdays, holidays, vacations, significant moments, lessons learned, or notable occurrences.
+## Key Highlights:
 
-Journal Entry:
-If the transcript includes a mention of journaling, generate a narrative about the subject (person, place, or event).
+Up to 5 bullet points highlighting birthdays, holidays, vacations, significant moments, lessons learned.
 
-If no mention of "journal" appears, omit this section entirely.
+Do not include the section below if no journal entry is found.
 
-Learnings:
-Identify only procedural content: Review transcripts and summaries for newly learned methods, procedures, or processes.
+## Journal Entry:
 
-If identified, outline them in step-by-step numbered format, detailing specific actions.
+This narrative will be as lengthy as needed to capture the details provided by the transcript if the word "journal" is seen. It should capture all the nostalgia, the feelings and emotions exxpressed regarding each journal entry. There may be more than one journal entry topic. Create at least one paragraph for each journal topic. Include quotes that illustrate the feelings and emotions expressed or the facts stated.
 
-Do not include general observations, reflections, or abstract insights.
+Do not include the section below if no health data is found.
 
-If no procedural content is present, omit this section entirely—no heading, no text.
+## Health Data:
 
-Health Status:
-Only generate a statement about health if transcripts or summaries explicitly reference a health status (e.g., symptoms, test results, or conditions). Otherwise, do not generate a statement.
+| Measurement | Value |
+| ----------- | ----- |
+| Blood sugar |       |
+| Weight      |       |
+| Step count  |       |
 
-If health measurements were explicitly recorded, include them in a markdown table. Only list numerical values for:
+Do not include the section below if no medical consultation is found.
 
-Blood pressure
+## Medical Consultation:
 
-Heart rate
+If a medical visit is detected in the transcripts for the day provide a 3 sentence summary of the medical visit focusing on medical condition, include any changes in medication or treatment or medical concerns raised.
 
-Blood sugar
+Do not include the section below if no psychological consultation is found.
 
-Weight
+## Psychological Visit:
 
-Height
+If a visit to a psychologist is detected, provide a 3 sentence summary and include a 3 bullet point list of follow up or practices I should engage in based directly on the conversation transcripts.
 
-Step count
+END
 
-If no measurements are provided, omit the table entirely.
-
-If a conversation with a medical professional is documented, provide a detailed summary strictly based on transcript content.
-
-Include any changes in medication or treatment.
-
-List future appointments or important follow-ups as bullet points.
-
-If no relevant health information is available, omit this section entirely—no heading, no text.
-
-Data Placeholders:
+Data:
 Bee Data: {BEE_CONTENT}
 
 Limitless Data: {LIMITLESS_CONTENT}
