@@ -13,17 +13,12 @@ class OpenAIHandler:
         self.journal_prompt_path = config.get('JOURNAL_PROMPT', '')
         self.journal_template = self._load_prompt_template(self.journal_prompt_path)
         
-    def generate_text(self, prompt, max_retries=3):
+    def generate_text(self, prompt, max_retries=3, temperature=0.7):
         """Generate text with retries for connection issues"""
         attempt = 0
         while attempt < max_retries:
             try:
-                response = self.client.chat.completions.create(
-                    model=self.model,
-                    messages=[{"role": "user", "content": prompt}],
-                    temperature=0.7,
-                )
-                return response.choices[0].message.content
+                return self._send_prompt(prompt, temperature)
             except AuthenticationError as e: # Catch AuthenticationError specifically
                 print(f"\n❌ FATAL ERROR: OpenAI Authentication Failed (Invalid API Key?):")
                 print(f"   {str(e)}")
@@ -74,16 +69,22 @@ class OpenAIHandler:
             print(f"❌ Error loading prompt template: {e}")
             return None
 
+    def _send_prompt(self, prompt, temperature=0.7):
+        """Internal method to send a prompt to OpenAI and get the response content."""
+        print(f"Sending prompt to OpenAI (length: {len(prompt)} chars)")
+        response = self.client.chat.completions.create(
+            model=self.model,
+            messages=[{"role": "user", "content": prompt}],
+            temperature=temperature
+        )
+        print("Received response from OpenAI")
+        return response.choices[0].message.content
+
     def send_prompt(self, prompt):
-        """Send a prompt to OpenAI and get the response."""
+        """Public method to send a prompt to OpenAI with default settings.
+        This is maintained for backward compatibility."""
         try:
-            print(f"Sending prompt to OpenAI (length: {len(prompt)} chars)")
-            response = self.client.chat.completions.create(
-                model=self.model,
-                messages=[{"role": "user", "content": prompt}]
-            )
-            print("Received response from OpenAI")
-            return response.choices[0].message.content
+            return self._send_prompt(prompt)
         except Exception as e:
             print(f"Error sending prompt to OpenAI: {e}")
             return None

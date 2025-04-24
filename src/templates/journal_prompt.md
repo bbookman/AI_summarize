@@ -17,8 +17,6 @@ Never write the following in the file: ```markdown
 Do not generate the journal entry section if the day's transcript does not include a mention of journaling or the word journal.
 There may be more than one journal subject discussed. Create a paragraph for each subject.
 
-If no blood sugar, weight or steps count are described, do not include the Health Data section.
-
 Review the day data. If a medical consultation is not encountered, do not include the Medical Consultation section.
 Review the day data. If a psychological consultation is not encountered, do not include the Psychological Consultation section.
 
@@ -27,6 +25,14 @@ If both Bee and Limitless files are provided, prioritize Bee data.
 Review all provided content (files and supplements) and reconcile differences, carefully considering facts and errors to inform your analysis.
 
 Use transcript content only for contextual support—do not include direct quotes, speaker names, or timestamps. However, do note the word "journal" as this should trigger creating a journal section described below.
+
+Markdown section generation instructions:
+
+Journal Entry: Only include this section if the day's transcript contains the word "journal," "journaling," or "journals" (regex: `/journal(ing|s)?/i`). Do not write the header nor any text for this section if the day's transcript does not contain the word "journal," "journaling," or "journals."
+
+Health Data: Only include this section if the day's transcript contains the words like "weight", "steps", "walked", "Blood sugar" or "Blood Glucose". These words will be followed by a measurement. Do not write the header nor any text for this section if the day's transcript does not contain the words like "weight", "steps", "walked" or "Blood sugar" or "Blood Glucose".
+
+Psychologist Visit: The majority of visits to my psychologist occur on a Monday at 3 pm. These visits are usually 60 minutes long. Words such as "anxiety", "bipolar" or "mania" may indicate a visit has occurred. If no visit is encountered, do not include the Psychologist Visit section. o not write the header nor any text for this section if the day's transcript does not contain a visit to the psychologist.
 
 Markdown Document Structure
 START
@@ -39,8 +45,8 @@ first-person recap of the day
 
 ## Sentiment Analysis:
 
-A single line measure of frustration level as High, Medium, or Low.
-A single line stating the highest sentiment. Example: Positive
+Frustration level: A single line measure of frustration level as High, Medium, or Low.
+Overall sentiment: A single line stating the highest sentiment.
 
 | Sentiment | % |
 
@@ -53,15 +59,15 @@ A single line stating the highest sentiment. Example: Positive
 
 Up to 5 bullet points highlighting birthdays, holidays, vacations, significant moments, lessons learned.
 
-Do not include the section below if no journal entry is found.
-
 ## Journal Entry:
 
-This narrative will be as lengthy as needed to capture the details provided by the transcript if the word "journal" is seen. It should capture all the nostalgia, the feelings and emotions exxpressed regarding each journal entry. There may be more than one journal entry topic. Create at least one paragraph for each journal topic. Include quotes that illustrate the feelings and emotions expressed or the facts stated.
+If detected as described above, write a narrative that should capture all nostalgia, feelings, and emotions expressed regarding each journal entry mentioned. Create at least two paragraphs per journal topic.
 
-Do not include the section below if no health data is found.
+Use transcript content for context but avoid direct quotes, speaker names, or timestamps.
 
 ## Health Data:
+
+Only include this section if the day's transcript contains the words like "weight", "steps", "walked" or "Blood sugar" or "Blood Glucose".
 
 | Measurement | Value |
 | ----------- | ----- |
@@ -69,13 +75,9 @@ Do not include the section below if no health data is found.
 | Weight      |       |
 | Step count  |       |
 
-Do not include the section below if no medical consultation is found.
-
 ## Medical Consultation:
 
 If a medical visit is detected in the transcripts for the day provide a 3 sentence summary of the medical visit focusing on medical condition, include any changes in medication or treatment or medical concerns raised.
-
-Do not include the section below if no psychological consultation is found.
 
 ## Psychological Visit:
 
