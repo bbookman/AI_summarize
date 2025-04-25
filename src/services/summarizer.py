@@ -1,7 +1,7 @@
 import os
 from datetime import datetime
 from utils.openai_handler import OpenAIHandler
-from utils.file_handler import write_file
+from utils.file_handler import write_file, ensure_directory_exists
 import calendar # Added import
 import sys # Added import
 
@@ -46,7 +46,7 @@ class Summarizer:
             target_dir = os.path.join(self.output_dir, year, month_name)
         
         # Create output directory structure if it doesn't exist
-        os.makedirs(target_dir, exist_ok=True)
+        ensure_directory_exists(target_dir)
         
         # Create filename in YYYY-MM-DD format with optional suffix
         filename = f"{date_str}{suffix}.md"

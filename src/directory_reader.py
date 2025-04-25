@@ -102,19 +102,37 @@ class DirectoryReader:
         """Public wrapper for _extract_date method."""
         return self._extract_date(file_path)
 
-    def read_bee_data_for_date(self, date):
-        """Read bee data for a specific date, remove stop words and repetitive phrases."""
-        # Find files matching the date pattern
-        bee_files = self.get_bee_files()
-        matching_files = []
+    def read_data_for_date(self, date, source_type):
+        """
+        Generic method to read data for a specific date from a given source type.
         
-        for file in bee_files:
+        Args:
+            date (str): Date string in YYYY-MM-DD format
+            source_type (str): Either 'BEE' or 'LIMITLESS' to indicate source
+            
+        Returns:
+            str: Combined content from all matching files or None if no files found
+        """
+        # Determine which source files to use
+        if source_type.upper() == 'BEE':
+            source_files = self.get_bee_files()
+            source_name = 'BEE'
+        elif source_type.upper() == 'LIMITLESS':
+            source_files = self.get_limitless_files()
+            source_name = 'LIMITLESS'
+        else:
+            print(f"Invalid source type: {source_type}")
+            return None
+            
+        # Find files matching the date pattern
+        matching_files = []
+        for file in source_files:
             file_date = self.extract_date_from_filename(file)
             if file_date == date:
                 matching_files.append(file)
         
         if not matching_files:
-            print(f"No BEE data found for {date}")
+            print(f"No {source_name} data found for {date}")
             return None
         
         # Read and combine the content
@@ -124,9 +142,8 @@ class DirectoryReader:
                 with open(file, 'r', encoding='utf-8') as f:
                     content = f.read()
                     # Truncate extremely large files if needed
-
                     if len(content) > 30000:  # Arbitrary limit to prevent context explosion
-                        print(f"⚠️ Truncating large BEE file: {file}")
+                        print(f"⚠️ Truncating large {source_name} file: {file}")
                         print(f"File size: {len(content)} characters")
                         content = content[:30000] + "\n...[content truncated due to size]..."
                     
@@ -139,43 +156,14 @@ class DirectoryReader:
                 print(f"Error reading {file}: {e}")
         
         return combined_content
+
+    def read_bee_data_for_date(self, date):
+        """Read bee data for a specific date, remove stop words and repetitive phrases."""
+        return self.read_data_for_date(date, 'BEE')
 
     def read_limitless_data_for_date(self, date):
         """Read limitless data for a specific date, remove stop words and repetitive phrases."""
-        # Find files matching the date pattern
-        limitless_files = self.get_limitless_files()
-        matching_files = []
-        
-        for file in limitless_files:
-            file_date = self.extract_date_from_filename(file)
-            if file_date == date:
-                matching_files.append(file)
-        
-        if not matching_files:
-            print(f"No LIMITLESS data found for {date}")
-            return None
-        
-        # Read and combine the content
-        combined_content = ""
-        for file in matching_files:
-            try:
-                with open(file, 'r', encoding='utf-8') as f:
-                    content = f.read()
-                    # Truncate extremely large files if needed
-                    if len(content) > 30000:  # Arbitrary limit to prevent context explosion
-                        print(f"⚠️ Truncating large LIMITLESS file: {file}")
-                        print(f"File size: {len(content)} characters")
-                        content = content[:30000] + "\n...[content truncated due to size]..."
-                    
-                    # Remove stop words
-                    content_without_stopwords = _remove_stopwords(content)
-                    # Remove repetitive phrases
-                    final_content = _remove_repetitive_phrases(content_without_stopwords)
-                    combined_content += f"\n\n--- File: {os.path.basename(file)} ---\n{final_content}"
-            except Exception as e:
-                print(f"Error reading {file}: {e}")
-        
-        return combined_content
+        return self.read_data_for_date(date, 'LIMITLESS')
 
     def _get_files(self, directory):
         """Gets a list of files recursively from the given directory and its subdirectories."""

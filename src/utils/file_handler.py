@@ -1,3 +1,5 @@
+import os
+
 def read_file(file_path):
     """Read the contents of a file and return it."""
     print(f"\nReading file: {file_path}")
@@ -23,5 +25,9 @@ def write_file(file_path, content):
 
 def file_exists(file_path):
     """Check if a file exists."""
-    import os
     return os.path.isfile(file_path)
+
+def ensure_directory_exists(directory_path):
+    """Create directory if it doesn't exist."""
+    os.makedirs(directory_path, exist_ok=True)
+    return directory_path
