@@ -80,15 +80,6 @@ class OpenAIHandler:
         print("Received response from OpenAI")
         return response.choices[0].message.content
 
-    def send_prompt(self, prompt):
-        """Public method to send a prompt to OpenAI with default settings.
-        This is maintained for backward compatibility."""
-        try:
-            return self._send_prompt(prompt)
-        except Exception as e:
-            print(f"Error sending prompt to OpenAI: {e}")
-            return None
-
     def format_prompt(self, template, bee_content="", limitless_content="", facts_content="", errors_content=""):
         """Format the prompt template with all content."""
         print("\nFormatting prompt with:")
