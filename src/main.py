@@ -75,6 +75,7 @@ def process_dates(reader, summarizer, all_dates):
     """Process data for each date and return success counts."""
     processed_count = 0
     failed_count = 0
+    skipped_count = 0
 
     # Read supplementary data first
     print("\nReading facts and errors...")
@@ -84,7 +85,13 @@ def process_dates(reader, summarizer, all_dates):
 
     # Process each date
     for date in all_dates:
-        print(f"\nProcessing data for {date}...")
+        print(f"\nChecking data for {date}...")
+        
+        # Skip if a journal file already exists for this date
+        if summarizer.file_exists_for_date(date):
+            print(f"✓ Journal entry already exists for {date}, skipping...")
+            skipped_count += 1
+            continue
         
         # Read the data for this date
         bee_data = reader.read_bee_data_for_date(date)
@@ -101,13 +108,15 @@ def process_dates(reader, summarizer, all_dates):
         else:
             failed_count += 1
 
-    return processed_count, failed_count
+    return processed_count, failed_count, skipped_count
 
 
-def print_results(processed_count, failed_count, config):
+def print_results(processed_count, failed_count, skipped_count, config):
     """Print processing results and debug information."""
     print(f"\n=== AI Summarizer Complete ===")
     print(f"Successfully processed: {processed_count} date(s)")
+    if skipped_count > 0:
+        print(f"Skipped existing: {skipped_count} date(s)")
     if failed_count > 0:
         print(f"Failed to process: {failed_count} date(s)")
 
@@ -150,10 +159,10 @@ def main():
     if not all_dates:
         return
         
-    processed_count, failed_count = process_dates(reader, summarizer, all_dates)
+    processed_count, failed_count, skipped_count = process_dates(reader, summarizer, all_dates)
     
     # 6. Print results
-    print_results(processed_count, failed_count, config)
+    print_results(processed_count, failed_count, skipped_count, config)
 
 
 if __name__ == "__main__":

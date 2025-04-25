@@ -1,9 +1,11 @@
 import os
+import re
 from datetime import datetime
 from utils.openai_handler import OpenAIHandler
 from utils.file_handler import write_file, ensure_directory_exists
 import calendar # Added import
 import sys # Added import
+import glob # Added import for recursive file search
 
 class Summarizer:
     """Service to handle data reading and OpenAI summarization."""
@@ -17,6 +19,33 @@ class Summarizer:
         if not self.output_dir:
             raise ValueError("OUTPUT_DIR not configured")
         # print("✓ Summarizer initialized")
+        
+        # Cache of existing journal files (date -> filepath)
+        self.existing_files = self._load_existing_files()
+        
+    def _load_existing_files(self):
+        """Load existing journal files to avoid regenerating them."""
+        print("\nChecking for existing journal files...")
+        existing_files = {}
+        
+        # Recursively get all markdown files in the output directory
+        pattern = os.path.join(self.output_dir, "**", "*.md")
+        md_files = glob.glob(pattern, recursive=True)
+        
+        # Extract dates from filenames
+        date_pattern = re.compile(r"(\d{4}-\d{2}-\d{2})")
+        for file_path in md_files:
+            match = date_pattern.search(os.path.basename(file_path))
+            if match:
+                date = match.group(1)
+                existing_files[date] = file_path
+                
+        print(f"✓ Found {len(existing_files)} existing journal entries")
+        return existing_files
+        
+    def file_exists_for_date(self, date):
+        """Check if a journal file already exists for the given date."""
+        return date in self.existing_files
 
     def save_summary(self, summary, date=None, suffix=""):
         """Save summary with YYYY-MM-DD format filename, organized by year and month."""
