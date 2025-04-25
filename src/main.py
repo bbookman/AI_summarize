@@ -120,11 +120,72 @@ def print_results(processed_count, failed_count, skipped_count, config):
     if failed_count > 0:
         print(f"Failed to process: {failed_count} date(s)")
 
-    # Debug: Count files in output directory
-    result_files = glob.glob(os.path.join(config['OUTPUT_DIR'], '*.md'))
-    print(f"\nDebug: Found {len(result_files)} files in output directory")
-    for file in result_files:
-        print(f"- {os.path.basename(file)}")
+    # Debug: Count files in output directory (recursively)
+    recursive_pattern = os.path.join(config['OUTPUT_DIR'], "**", "*.md")
+    result_files = glob.glob(recursive_pattern, recursive=True)
+    print(f"\nDebug: Found {len(result_files)} files in output directory (recursive search)")
+    
+    # Show the most recent files
+    sorted_files = sorted(result_files, key=os.path.getmtime, reverse=True)
+    most_recent = sorted_files[:10] if len(sorted_files) > 10 else sorted_files
+    
+    for file in most_recent:
+        relative_path = os.path.relpath(file, config['OUTPUT_DIR'])
+        print(f"- {relative_path}")
+    
+    if len(sorted_files) > 10:
+        print(f"  ... and {len(sorted_files)-10} more files")
+
+
+def check_specific_date_files(reader, summarizer, dates_to_check):
+    """
+    Diagnostic function to check if specific dates have source files and journal entries.
+    
+    Args:
+        reader: DirectoryReader instance
+        summarizer: Summarizer instance
+        dates_to_check: List of date strings to check (YYYY-MM-DD format)
+    """
+    print("\n=== DIAGNOSTIC CHECK FOR SPECIFIC DATES ===")
+    
+    for date in dates_to_check:
+        print(f"\nChecking date: {date}")
+        
+        # Check for LIMITLESS files
+        limitless_files = []
+        for file_path in reader.get_limitless_files():
+            if date in file_path:
+                limitless_files.append(file_path)
+        
+        # Check for BEE files
+        bee_files = []
+        for file_path in reader.get_bee_files():
+            if date in file_path:
+                bee_files.append(file_path)
+        
+        # Check if journal file exists
+        journal_exists = summarizer.file_exists_for_date(date)
+        
+        # Report findings
+        print(f"  LIMITLESS files: {len(limitless_files)} found")
+        if limitless_files:
+            for f in limitless_files[:3]:  # Show up to 3 examples
+                print(f"    - {os.path.basename(f)}")
+            if len(limitless_files) > 3:
+                print(f"    - ... and {len(limitless_files)-3} more")
+        
+        print(f"  BEE files: {len(bee_files)} found")
+        if bee_files:
+            for f in bee_files[:3]:  # Show up to 3 examples
+                print(f"    - {os.path.basename(f)}")
+            if len(bee_files) > 3:
+                print(f"    - ... and {len(bee_files)-3} more")
+        
+        print(f"  Journal file exists: {'Yes' if journal_exists else 'No'}")
+        if journal_exists:
+            print(f"    - Path: {summarizer.existing_files[date]}")
+    
+    print("\n=== END DIAGNOSTIC CHECK ===\n")
 
 
 def main():
@@ -154,6 +215,9 @@ def main():
         print("❌ No source files found")
         return
 
+    # Add diagnostic output for specific dates
+    check_specific_date_files(reader, summarizer, ["2025-04-21", "2025-04-22", "2025-04-23", "2025-04-24"])
+        
     # 5. Extract dates and process
     all_dates = collect_dates(reader, bee_files, limitless_files)
     if not all_dates:
