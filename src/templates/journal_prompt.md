@@ -22,9 +22,7 @@ Markdown section generation instructions:
 
 Journal Entry: Only include this section if the day's transcript contains the word "journal," "journaling," or "journals" (regex: `/journal(ing|s)?/i`). Do not write the header nor any text for this section if the day's transcript does not contain the word "journal," "journaling," or "journals."
 
-Health Data: Only include this section if the day's transcript contains the words like "weight", "steps", "walked", "Blood sugar" or "Blood Glucose". These words will be followed by a measurement. Do not write the header nor any text for this section if the day's transcript does not contain the words like "weight", "steps", "walked" or "Blood sugar" or "Blood Glucose".
-
-Psychologist Visit: The majority of visits to my psychologist occur on a Monday or Tuesday at 3 pm. These visits are usually 60 minutes long. Words such as "anxiety", "bipolar" or "mania" may indicate a visit has occurred. If no visit is encountered, do not include the Psychologist Visit section. And do not write the header nor any text for this section if the day's transcript does not contain a visit to the psychologist.
+Note the optional sections below.  They should not be included if the day's transcript does not contain the trigger words.
 
 Markdown Document Structure
 START
@@ -47,10 +45,13 @@ If detected (regex: `/journal(ing|s)?/i`), write a narrative that should capture
 
 Use transcript content for context but avoid direct quotes, speaker names, or timestamps.
 
+### Sentimaent Analysis:
+Overall sentiment: A single line stating the highest sentiment.
+Sentement percentages: Positive  | Neutral | Negative
+
 OPTIONAL
-
-## Health And Wellness:
-
+## Health, Wellness and Mood:
+OPTIONAL
 ### General
 Health Rating: A single line measure of health as Excellent, Good, Fair, or Poor. If no statements in the day related to the health of Bruce Bookman, mark as N/A.
 Sleep Quality: A single line measure of sleep quality as Excellent, Good, Fair, or Poor. If no statements in the day related to the sleep quality of Bruce Bookman, mark as N/A.
@@ -58,19 +59,9 @@ Streess Level: A single line measure of stress level as High, Medium, Moderate o
 Frustration level: A single line measure of frustration level as High, Medium, Moderate or Low.
 Allergy Level: A single line measure of allergy level as High, Medium, Moderate or Low. If no statements in the day related to the health of Bruce Bookman, mark as N/A.
 
-### Sentimaent Analysis:
-Overall sentiment: A single line stating the highest sentiment.
-
-| Sentiment | % |
-
-| --- | --- |
-| Positive | percentage |
-| Neutral | percentage |
-| Negative | percentage |
-
+OPTIONAL
 ### Health Data:
-
-Only include this section if the day's transcript contains the words like "weight", "steps", "walked" or "Blood sugar" or "Blood Glucose".  
+Trigger words: Only include this section if the day's transcript contains the words like "weight", "steps", "walked", "Blood sugar", "Blood Glucose", "Bilogical age", "Cardiovascular", "Renal", "Metabolic". These words will be followed by a measurement. Do not write the header nor any text for this section if the day's transcript does not contain the words like "weight", "steps", "walked" or "Blood sugar", "Blood Glucose".
 
 In the Range column, provide the following:
 
@@ -84,18 +75,24 @@ For Step count: If the measure is below 6000, LOW  If within 6000 to 10000, HEAL
 | Blood sugar |       |       |
 | Weight      |       |        |
 | Step count  |       |        |
+| Biological age |       |        |
+| Cardiovascular contribuution |       |        | |
+| Renal contribution |       |        |
+| Metabolic contribution |       |        |
 
 
 OPTIONAL
-## Medical Consultation:
+### Medical Consultation:
 
-A medical visit includes a visit to a doctor, dentist, or any medical professional.
+Triogger: A medical visit includes a visit to a doctor, dentist, or any medical professional.
 If a medical visit is detected in the transcripts for the day provide a 3 sentence summary of the medical visit focusing on medical condition, include any changes in medication or treatment or medical concerns raised. Mark Armitage is my primary doctor.
 
-OPTIONAL
-## Psychological Visit:
+Add 3 bullet points of follow up or practices I should engage in based directly on the conversation transcripts with the medical professional.
 
-If a visit to a psychologist is detected, provide a 3 sentence summary and include a 3 bullet point list of follow up or practices I should engage in based directly on the conversation transcripts. Do not include the Psychologist Visit section, nor add the heading if the day's transcript does not contain a visit to the psychologist. The visit will most likely be on a Monday at 3 pm. Check the date and time as part of the detection of a psychologist visit.
+OPTIONAL
+### Psychological Visit:
+
+Trigger Words: "Bipolar", "Larry", "Anxiety", "Depression". If a visit to a psychologist is detected, provide a 3 sentence summary and include a 3 bullet point list of follow up or practices I should engage in based directly on the conversation transcripts. Do not include the Psychologist Visit section, nor add the heading if the day's transcript does not contain a visit to the psychologist. The visit will most likely be on a Monday at 3 pm. Check the date and time as part of the detection of a psychologist visit.
 
 END
 
