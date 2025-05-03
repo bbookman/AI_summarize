@@ -35,10 +35,10 @@ A first-person recap of the day
 
 ## Key Highlights:
 
-Up to 5 bullet points highlighting birthdays, holidays, vacations, significant moments, lessons learned.
+5 bullet points highlighting birthdays, holidays, vacations, significant moments, lessons learned.
+
 
 OPTIONAL
-
 ## Journal Entry:
 
 If detected (regex: `/journal(ing|s)?/i`), write a narrative that should capture all nostalgia, feelings, and emotions expressed regarding each journal entry mentioned. Create at least two paragraphs per journal topic.
@@ -47,7 +47,7 @@ Use transcript content for context but avoid direct quotes, speaker names, or ti
 
 ### Sentimaent Analysis:
 Overall sentiment: A single line stating the highest sentiment.
-Sentement percentages: Positive  | Neutral | Negative
+Sentement percentages: Positive: %, Neutral: %, Negative: %
 
 OPTIONAL
 ## Health, Wellness and Mood:
@@ -76,9 +76,7 @@ For Step count: If the measure is below 6000, LOW  If within 6000 to 10000, HEAL
 | Weight      |       |        |
 | Step count  |       |        |
 | Biological age |       |        |
-| Cardiovascular contribuution |       |        | |
-| Renal contribution |       |        |
-| Metabolic contribution |       |        |
+
 
 
 OPTIONAL

@@ -4,13 +4,15 @@ from openai import OpenAI
 # Update the error imports for newer OpenAI SDK versions
 from openai import APIError, APIConnectionError, RateLimitError, AuthenticationError # Added AuthenticationError
 import sys # Added import
+import os # Added import for path joining
 
 class OpenAIHandler:
     def __init__(self, config):
         self.client = OpenAI(api_key=config['OPENAI_API_KEY'])
         self.model = config['OPEN_AI_MODEL']
         # Load journal prompt template during initialization
-        self.journal_prompt_path = config.get('JOURNAL_PROMPT', '')
+        self.journal_prompt_file_name = config.get('JOURNAL_PROMPT_FILE_NAME', '')
+        self.journal_prompt_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'templates', self.journal_prompt_file_name) if self.journal_prompt_file_name else ''
         self.journal_template = self._load_prompt_template(self.journal_prompt_path)
         
     def generate_text(self, prompt, max_retries=3, temperature=0.7):

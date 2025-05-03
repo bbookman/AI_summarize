@@ -4,6 +4,8 @@
   "FACTS": "/Users/brucebookman/bruce_vault/Conversations/facts",
   "ERRORS": "/Users/brucebookman/bruce_vault/Conversations/errors",
   "OPEN_AI_MODEL": "gpt-4o-mini",
-  "JOURNAL_PROMPT": "/Users/brucebookman/code/AI_summarize/python-directory-reader/src/templates/journal_prompt.md",
-  "OUTPUT_DIR": "/Users/brucebookman/bruce_vault/Conversations/journal"
+  "JOURNAL_PROMPT_FILE_NAME": "journal.md",
+  "OUTPUT_DIR": "/Users/brucebookman/bruce_vault/Conversations/journal",
+  "WEEKLY_PROMPTS": "weekly.md,simpsons.md",
+  "WEEKLY_RESULTS_PATH": "./weekly"
 }

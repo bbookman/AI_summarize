@@ -62,17 +62,20 @@ class Summarizer:
             # Parse the date string to get year and month
             date_obj = datetime.strptime(date_str, '%Y-%m-%d')
             year = str(date_obj.year)
-            month_name = calendar.month_name[date_obj.month]
+            month_num = date_obj.month
+            month_name = calendar.month_name[month_num]
+            # Format month directory as "MM-MonthName" (e.g., "02-February")
+            month_dir_name = f"{month_num:02d}-{month_name}"
         except ValueError:
             print(f"❌ Invalid date format: {date_str}. Cannot organize by date.")
             # Fallback to saving directly in OUTPUT_DIR
             year = ""
-            month_name = ""
+            month_dir_name = ""
 
         # Construct the target directory path
         target_dir = self.output_dir
-        if year and month_name:
-            target_dir = os.path.join(self.output_dir, year, month_name)
+        if year and month_dir_name:
+            target_dir = os.path.join(self.output_dir, year, month_dir_name)
         
         # Create output directory structure if it doesn't exist
         ensure_directory_exists(target_dir)
@@ -89,12 +92,18 @@ class Summarizer:
             raise IOError(f"Failed to save summary to {filepath}: {e}")
 
     def generate_journal(self, date, bee_data, limitless_data, facts=None, errors=None):
-        """Generate a journal entry using the JOURNAL_PROMPT template."""
+        """Generate a journal entry using the journal prompt template."""
         print(f"\nGenerating journal for {date}...")
 
         # 1. Load the journal prompt template
         try:
-            with open(self.config['JOURNAL_PROMPT'], 'r') as file:
+            # Construct the journal prompt path using the template directory and filename
+            journal_prompt_path = os.path.join(
+                os.path.dirname(os.path.dirname(__file__)),
+                'templates',
+                self.config.get('JOURNAL_PROMPT_FILE_NAME', '')
+            )
+            with open(journal_prompt_path, 'r') as file:
                 template = file.read()
         except Exception as e:
             print(f"❌ Failed to load journal prompt template: {e}")

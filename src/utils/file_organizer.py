@@ -42,15 +42,16 @@ class FileOrganizer:
             match = self.date_pattern.search(file)
             if match:
                 year, month_num = match.groups()
-                # Convert month number to name
+                # Convert month number to name and format as "MM-MonthName"
                 month_name = calendar.month_name[int(month_num)]
+                month_dir_name = f"{month_num}-{month_name}"
                 
                 # Create year directory if it doesn't exist
                 year_dir = os.path.join(directory_path, year)
                 ensure_directory_exists(year_dir)
                 
                 # Create month directory if it doesn't exist
-                month_dir = os.path.join(year_dir, month_name)
+                month_dir = os.path.join(year_dir, month_dir_name)
                 ensure_directory_exists(month_dir)
                 
                 # Move the file to the appropriate directory

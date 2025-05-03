@@ -10,6 +10,7 @@ from directory_reader import DirectoryReader
 from services.summarizer import Summarizer
 from utils.file_organizer import FileOrganizer
 from utils.file_handler import ensure_directory_exists
+from utils.weekly_processor import WeeklyProcessor  # Add weekly processor import
 
 
 def get_api_key():
@@ -25,8 +26,9 @@ def setup_services(config):
     ensure_directory_exists(config['OUTPUT_DIR'])
     reader = DirectoryReader(config)
     summarizer = Summarizer(config)
+    weekly_processor = WeeklyProcessor(config, summarizer.openai)  # Initialize WeeklyProcessor
     print("✓ Services initialized")
-    return reader, summarizer
+    return reader, summarizer, weekly_processor  # Return weekly processor
 
 
 def collect_dates(reader, bee_files, limitless_files):
@@ -188,6 +190,28 @@ def check_specific_date_files(reader, summarizer, dates_to_check):
     print("\n=== END DIAGNOSTIC CHECK ===\n")
 
 
+def process_weekly_summaries(weekly_processor, summarizer):
+    """Process weekly summaries for all complete weeks."""
+    print("\n=== Processing Weekly Summaries ===")
+    
+    # Get existing journal files from the summarizer
+    existing_files = summarizer.existing_files
+    
+    if not existing_files:
+        print("No existing journal files to process for weekly summaries.")
+        return 0
+    
+    # Process all complete weeks
+    processed_count = weekly_processor.process_all_complete_weeks(existing_files)
+    
+    if processed_count > 0:
+        print(f"✓ Successfully processed {processed_count} weeks for weekly summaries")
+    else:
+        print("No weeks were processed for weekly summaries")
+    
+    return processed_count
+
+
 def main():
     """Main entry point for the AI Summarizer application."""
     print("\n=== Starting AI Summarizer ===")
@@ -204,7 +228,7 @@ def main():
     file_organizer.organize_all_directories(config)
     
     # 3. Initialize services
-    reader, summarizer = setup_services(config)
+    reader, summarizer, weekly_processor = setup_services(config)  # Receive weekly_processor
 
     # 4. Collect files
     print("\nCollecting available files...")
@@ -225,8 +249,15 @@ def main():
         
     processed_count, failed_count, skipped_count = process_dates(reader, summarizer, all_dates)
     
-    # 6. Print results
+    # 6. Process weekly summaries (new step)
+    weekly_count = process_weekly_summaries(weekly_processor, summarizer)
+    
+    # 7. Print results
     print_results(processed_count, failed_count, skipped_count, config)
+    
+    # Print weekly processing results
+    if weekly_count > 0:
+        print(f"\n✓ Weekly summaries processed for {weekly_count} complete weeks")
 
 
 if __name__ == "__main__":
