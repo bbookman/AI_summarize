@@ -106,11 +106,34 @@ class WeeklyProcessor:
         # Get the base filename without extension
         base_name = os.path.splitext(prompt_name)[0]
         
-        # Create the filename with the week number and prompt name
-        filename = f"{week_number}-{base_name}.md"
+        # Get all dates in the week
+        week_dates = self._get_dates_for_week(week_number)
+        
+        if week_dates:
+            # Get the last date of the week (Sunday)
+            last_date = datetime.strptime(week_dates[-1], '%Y-%m-%d')
+            
+            # Format the filename: YYYY-Sunday-Month-DD-template.md
+            year = last_date.strftime("%Y")
+            day_name = last_date.strftime("%A")  # Sunday
+            month = last_date.strftime("%B")     # May
+            day = last_date.strftime("%d")       # 23
+            
+            filename = f"{year}-{day_name}-{month}-{day}-{base_name}.md"
+        else:
+            # Fallback in case week_dates is empty
+            print("⚠️ Could not determine week dates, using fallback filename")
+            filename = f"unknown-date-{base_name}.md"
+        
+        # Check if weekly_results_path is absolute or relative
+        if os.path.isabs(self.weekly_results_path):
+            # If it's an absolute path, use it directly
+            weekly_dir = self.weekly_results_path
+        else:
+            # If it's relative, join it with output_dir
+            weekly_dir = os.path.join(self.output_dir, self.weekly_results_path)
         
         # Ensure the weekly results directory exists
-        weekly_dir = os.path.join(self.output_dir, self.weekly_results_path)
         ensure_directory_exists(weekly_dir)
         
         # Create the full file path
