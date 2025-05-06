@@ -101,13 +101,13 @@ class WeeklyProcessor:
             formatted_data += f"\n\n--- {date} ---\n{content}"
         return formatted_data
     
-    def _save_weekly_result(self, week_number, prompt_name, content):
+    def _save_weekly_result(self, representative_date_for_week, prompt_name, content):
         """Save the weekly result to a file."""
         # Get the base filename without extension
         base_name = os.path.splitext(prompt_name)[0]
         
         # Get all dates in the week
-        week_dates = self._get_dates_for_week(week_number)
+        week_dates = self._get_dates_for_week(representative_date_for_week)
         
         if week_dates:
             # Get the last date of the week (Sunday)
@@ -158,8 +158,10 @@ class WeeklyProcessor:
             print(f"❌ Week containing {date_str} has no data at all. Skipping weekly processing.")
             return False
         
-        # Get the week number
-        week_number = self._get_week_number(date_str)
+        # Get the week number - this is not used for filename generation directly anymore in _save_weekly_result
+        # but might be useful for other logging or if the filename format changes back.
+        # For now, its direct use in _save_weekly_result's date calculations was the issue.
+        # week_number = self._get_week_number(date_str) 
         
         # Collect data from all available journal entries in the week
         weekly_data = self._collect_weekly_data(week_dates, existing_files)
@@ -187,7 +189,8 @@ class WeeklyProcessor:
             
             if weekly_summary:
                 # Save the weekly summary
-                self._save_weekly_result(week_number, prompt_filename, weekly_summary)
+                # Pass date_str (start of the week) instead of week_number for filename generation
+                self._save_weekly_result(date_str, prompt_filename, weekly_summary)
                 success_count += 1
             else:
                 print(f"❌ Failed to generate weekly summary using {prompt_filename}")
