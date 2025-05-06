@@ -29,7 +29,10 @@ START
 
 # Summary of <Day name .. example Monday, Tuesday>:
 
-Single line identifying the sources of data Bee, Bee and Limitless, or Limitless.
+For the line identifying the data source(s), strictly follow this logic to produce a single line in the format "Source(s): [Derived Source Name]":
+- If the {BEE_CONTENT} variable contains actual data (i.e., is not "No data available") AND the {LIMITLESS_CONTENT} variable is "No data available", then the line MUST be: **Source(s): Bee**
+- If BOTH the {BEE_CONTENT} variable AND the {LIMITLESS_CONTENT} variable contain actual data (i.e., neither is "No data available"), then the line MUST be: **Source(s): Bee and Limitless**
+- If the {LIMITLESS_CONTENT} variable contains actual data AND the {BEE_CONTENT} variable is "No data available", then the line MUST be: **Source(s): Limitless**
 
 A first-person recap of the day
 
@@ -41,13 +44,15 @@ A first-person recap of the day
 OPTIONAL
 ## Journal Entry:
 
-If detected (regex: `/journal(ing|s)?/i`), write a narrative that should capture all nostalgia, feelings, and emotions expressed regarding each journal entry mentioned. Create at least two paragraphs per journal topic.
+**CRITICAL: Only include the "## Journal Entry:" header and the following content IF the day's transcript contains "journal," "journaling," or "journals" (regex: `/journal(ing|s)?/i`). If these words are NOT found, OMIT THIS ENTIRE "Journal Entry" SECTION, including its header AND the "Sentiment Analysis" subsection below.**
 
 Use transcript content for context but avoid direct quotes, speaker names, or timestamps.
 
 ### Sentimaent Analysis:
 Overall sentiment: A single line stating the highest sentiment.
 Sentement percentages: Positive: %, Neutral: %, Negative: %
+
+Sentiment Rationale: A single paragraph (3-4 sentences) explaining the basis for the sentiment analysis. This should briefly reference the source data, such as the number of positive, negative, or neutral summaries or transcript segments. For example: "The positive sentiment was derived from several joyful summaries and interactions noted in the Bee transcripts. Only one transcript segment indicated a negative tone, while the remaining data was largely neutral."
 
 OPTIONAL
 ## Health, Wellness and Mood:
@@ -65,10 +70,21 @@ Trigger words: Only include this section if the day's transcript contains the wo
 
 In the Range column, provide the following:
 
-For Blood Sugar: If the measure is below 80, LOW.  If within 80 to 130, NORMAL.  If above 130, HIGH.
-For Weight: If the measure is below 132, LOW.  If within 133 to 173, NORMAL.  174 to 208 is OVERWEIGHT.  If above 209, OBESE.
+For Blood Sugar:
+- Below 80: LOW
+- 80 to 130: NORMAL
+- Above 130: HIGH
 
-For Step count: If the measure is below 6000, LOW  If within 6000 to 10000, HEALTHY.  If above 10000, GREAT
+For Weight (lbs): **Adhere strictly to these ranges for the 'Range' column:**
+- Below 132 lbs: LOW
+- 133 lbs to 173 lbs: NORMAL
+- 174 lbs to 208 lbs: OVERWEIGHT
+- 209 lbs and above: OBESE
+
+For Step count:
+- Below 6000: LOW
+- 6000 to 10000: HEALTHY
+- Above 10000: GREAT
 
 | Measurement | Value | Range |
 | ----------- | ----- | ----- |
@@ -82,7 +98,9 @@ For Step count: If the measure is below 6000, LOW  If within 6000 to 10000, HEAL
 OPTIONAL
 ### Medical Consultation:
 
-Triogger: A medical visit includes a visit to a doctor, dentist, or any medical professional.
+CRITICAL: Only include the "### Medical Consultation:" header and the following content IF a medical visit (doctor, dentist, or any medical professional) is detected in the day's transcript. If no medical visit is detected, OMIT THIS ENTIRE "Medical Consultation" SECTION, including its header
+
+Trigger: A medical visit includes a visit to a doctor, dentist, or any medical professional.
 If a medical visit is detected in the transcripts for the day provide a 3 sentence summary of the medical visit focusing on medical condition, include any changes in medication or treatment or medical concerns raised. Mark Armitage is my primary doctor.
 
 Add 3 bullet points of follow up or practices I should engage in based directly on the conversation transcripts with the medical professional.
@@ -90,7 +108,16 @@ Add 3 bullet points of follow up or practices I should engage in based directly 
 OPTIONAL
 ### Psychological Visit:
 
-Trigger Words: "Bipolar", "Larry", "Anxiety", "Depression". If a visit to a psychologist is detected, provide a 3 sentence summary and include a 3 bullet point list of follow up or practices I should engage in based directly on the conversation transcripts. Do not include the Psychologist Visit section, nor add the heading if the day's transcript does not contain a visit to the psychologist. The visit will most likely be on a Monday at 3 pm. Check the date and time as part of the detection of a psychologist visit.
+CRITICAL: Only include the "### Psychological Visit:" header and the following content IF a psychological visit (e.g., triggered by words like "Bipolar", "Larry", "Anxiety", "Depression", or a Monday 3 PM appointment) is detected in the day's transcript. If no such visit is detected, OMIT THIS ENTIRE "Psychological Visit" SECTION, including its header.
+
+Trigger Words: "Bipolar", "Larry", "Anxiety", "Depression", "Manic", "Mania".  The visit will most likely be on a Monday or Tuesday at 3 pm. Check the date and time and trigger words as part of the detection of a psychologist visit.
+
+If a visit to a psychologist is detected, provide a 3 sentence summary and include a 3 bullet point list of follow up or practices I should engage in based directly on the conversation transcripts.
+
+### Psychiatrist Visit:
+CRITICAL: Only include the "### Psychiatrist Visit:" header and the following content IF a visit to a psychiatrist is detected in the day's transcript. If no visit to a psychiatrist is detected, OMIT THIS ENTIRE "Psychiatrist Visit" SECTION, including its header
+
+Trigger Words: "Dorinda", "Dorinda Dew", "Coastal Carolina Neuropsychiatric Center". If a visit to a psychiatrist is detected, provide a 3 sentence summary and include a 3 bullet point list of follow up or practices I should engage in based directly on the conversation transcripts. 
 
 END
 
