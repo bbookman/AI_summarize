@@ -5,6 +5,8 @@ import calendar
 from datetime import datetime, timedelta
 from utils.file_handler import ensure_directory_exists, read_file
 from utils.openai_handler import OpenAIHandler
+import nltk # Add NLTK import
+from nltk.corpus import stopwords # Import stopwords
 
 class WeeklyProcessor:
     """Process weekly journal data using multiple prompts."""
@@ -94,11 +96,41 @@ class WeeklyProcessor:
         
         return weekly_data
     
-    def _format_weekly_data(self, weekly_data):
-        """Format the weekly data for use in prompt templates."""
+    def _format_weekly_data(self, weekly_data, max_chars_per_day=None, remove_stopwords=False):
+        """
+        Format the weekly data for use in prompt templates.
+        Optionally truncate content per day and remove common English stopwords using NLTK.
+        """
         formatted_data = ""
+        
+        stop_words_set = set()
+        if remove_stopwords:
+            try:
+                stop_words_set = set(stopwords.words('english'))
+                # We are specifically NOT adding "yes" and "no" here,
+                # and NLTK's default English list doesn't include them.
+            except LookupError:
+                print("⚠️ NLTK stopwords corpus not found. Please download it by running: import nltk; nltk.download('stopwords')")
+                # Fallback to an empty set if NLTK stopwords are not available
+                # Or, you could fall back to the previous hardcoded list here if desired.
+                pass # Using an empty set means no stopwords will be removed if download failed
+
         for date, content in sorted(weekly_data.items()):
-            formatted_data += f"\n\n--- {date} ---\n{content}"
+            processed_content = content
+            if max_chars_per_day and len(processed_content) > max_chars_per_day:
+                processed_content = processed_content[:max_chars_per_day] + "..."
+                print(f"✂️ Truncated content for {date} to {max_chars_per_day} chars.")
+
+            if remove_stopwords and stop_words_set: # Check if stop_words_set is populated
+                words = processed_content.split()
+                original_word_count = len(words)
+                # Basic stopword removal, could be improved with regex for punctuation
+                words = [word for word in words if word.lower() not in stop_words_set]
+                processed_content = " ".join(words)
+                if original_word_count != len(words):
+                    print(f"✂️ Removed {original_word_count - len(words)} stopwords using NLTK for {date}.")
+            
+            formatted_data += f"\n\n--- {date} ---\n{processed_content}"
         return formatted_data
     
     def _save_weekly_result(self, representative_date_for_week, prompt_name, content):
@@ -167,7 +199,9 @@ class WeeklyProcessor:
         weekly_data = self._collect_weekly_data(week_dates, existing_files)
         
         # Format the weekly data for use in prompt templates
-        formatted_data = self._format_weekly_data(weekly_data)
+        # Enabling stopword removal by default. Max_chars_per_day is not set by default.
+        # These could be made configurable via self.config if needed.
+        formatted_data = self._format_weekly_data(weekly_data, remove_stopwords=True)
         
         success_count = 0
         
@@ -210,30 +244,3 @@ class WeeklyProcessor:
         unique_weeks = set()
         for date in all_dates:
             week_dates = self._get_dates_for_week(date)
-            week_start = week_dates[0]  # Monday of the week
-            unique_weeks.add(week_start)
-        
-        return sorted(list(unique_weeks))
-    
-    def process_all_complete_weeks(self, existing_files):
-        """Process all weeks that have at least one day of data."""
-        # Find all weeks with any data
-        weeks_with_data = self.find_weeks_with_data(existing_files)
-        
-        if not weeks_with_data:
-            print("No weeks with data found to process")
-            return 0
-        
-        print(f"\nFound {len(weeks_with_data)} weeks with at least one day of data to process")
-        
-        processed_count = 0
-        
-        # Process each week with data
-        for week_start in weeks_with_data:
-            print(f"\nProcessing week starting {week_start}")
-            
-            if self.process_week(week_start, existing_files):
-                processed_count += 1
-        
-        print(f"\nProcessed {processed_count} weeks successfully")
-        return processed_count
