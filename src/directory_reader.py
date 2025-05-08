@@ -3,6 +3,7 @@ import re
 from datetime import datetime
 from utils.file_handler import read_file, write_file
 from utils.openai_handler import OpenAIHandler
+from utils.text_ranker import TextRanker  # Import the new TextRanker
 import nltk
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
@@ -35,52 +36,64 @@ def _remove_stopwords(text):
     filtered_sentence = [w for w in word_tokens if not w.lower() in stop_words]
     return " ".join(filtered_sentence)
 
-def _remove_repetitive_phrases(text, n=2, threshold=0.2):
-    """Remove repetitive phrases from a given text."""
+def _remove_repetitive_phrases(text, min_n=2, max_n=5, threshold=0.1):
+    """
+    Remove repetitive phrases from a given text using multiple n-gram sizes.
+    
+    Args:
+        text: Input text to process
+        min_n: Minimum n-gram size to check (default: 2)
+        max_n: Maximum n-gram size to check (default: 5)
+        threshold: Frequency threshold to consider phrases repetitive (default: 0.1 = 10%)
+        
+    Returns:
+        Text with repetitive phrases removed
+    """
     if not text:
         return text
     
     # Tokenize the text into words
     words = word_tokenize(text)
     
-    # Avoid processing if text is too short for n-grams
-    if len(words) < n:
-        return text
+    # Track positions of repetitive n-grams
+    to_remove = set()
+    
+    # Process multiple n-gram sizes, starting with largest
+    # This helps remove longer repetitive phrases first
+    for n in range(max_n, min_n - 1, -1):
+        # Skip if text is too short for this n-gram size
+        if len(words) < n:
+            continue
+            
+        # Generate n-grams (phrases of n words)
+        ngrams = list(nltk.ngrams(words, n))
+        
+        # Avoid division by zero if no n-grams are generated
+        if not ngrams:
+            continue
 
-    # Generate n-grams (phrases of n words)
-    ngrams = list(nltk.ngrams(words, n))
-    
-    # Avoid division by zero if no n-grams are generated
-    if not ngrams:
-        return text
-
-    # Count the frequency of each n-gram
-    ngram_counts = Counter(ngrams)
-    
-    # Calculate the total number of n-grams
-    total_ngrams = len(ngrams)
-    
-    # Identify repetitive n-grams based on the threshold
-    repetitive_ngrams = {ngram: count for ngram, count in ngram_counts.items()
-                         if count / total_ngrams > threshold}
-    
-    # Remove repetitive n-grams from the text
-    filtered_words = []
-    i = 0
-    while i < len(words):
-        found_repetitive = False
-        # Check only if there are enough words left for an n-gram
-        if i <= len(words) - n:
+        # Count the frequency of each n-gram
+        ngram_counts = Counter(ngrams)
+        
+        # Calculate the total number of n-grams
+        total_ngrams = len(ngrams)
+        
+        # Identify repetitive n-grams based on the threshold
+        repetitive_ngrams = {ngram for ngram, count in ngram_counts.items()
+                            if count / total_ngrams > threshold}
+        
+        # Mark positions of repetitive n-grams
+        for i in range(len(words) - n + 1):
             current_ngram = tuple(words[i:i+n])
             if current_ngram in repetitive_ngrams:
-                i += n  # Skip the entire n-gram
-                found_repetitive = True
-        
-        if not found_repetitive:
-            filtered_words.append(words[i])
-            i += 1
+                # Mark all positions in this n-gram
+                for j in range(i, i+n):
+                    to_remove.add(j)
     
-    # Join the filtered words back into a text
+    # Create new text without repetitive phrases
+    filtered_words = [word for i, word in enumerate(words) if i not in to_remove]
+    
+    # Join the filtered words back into text
     return " ".join(filtered_words)
 
 
@@ -88,6 +101,11 @@ class DirectoryReader:
     def __init__(self, config):
         print("\nInitializing Directory Reader...")
         self.config = config
+        
+        # Initialize TextRanker with compression ratio from config
+        self.text_ranker = TextRanker(
+            compression_ratio=config.get('TEXT_RANK_COMPRESSION_RATIO', 0.3)
+        )
         print("✓ Directory Reader initialized")
 
     def get_bee_files(self):
@@ -147,10 +165,21 @@ class DirectoryReader:
                         print(f"File size: {len(content)} characters")
                         content = content[:30000] + "\n...[content truncated due to size]..."
                     
+                    # First use TextRank to compress the content
+                    original_length = len(content)
+                    compressed_content = self.text_ranker.compress_text(content)
+                    
+                    # Then apply traditional processing
                     # Remove stop words
-                    content_without_stopwords = _remove_stopwords(content)
+                    content_without_stopwords = _remove_stopwords(compressed_content)
                     # Remove repetitive phrases
                     final_content = _remove_repetitive_phrases(content_without_stopwords)
+                    
+                    # Log compression statistics
+                    final_length = len(final_content)
+                    compression_percentage = ((original_length - final_length) / original_length) * 100 if original_length > 0 else 0
+                    print(f"📊 {source_name} content compressed: {original_length} → {final_length} chars ({compression_percentage:.1f}% reduction)")
+                    
                     combined_content += f"\n\n--- File: {os.path.basename(file)} ---\n{final_content}"
             except Exception as e:
                 print(f"Error reading {file}: {e}")
@@ -158,11 +187,11 @@ class DirectoryReader:
         return combined_content
 
     def read_bee_data_for_date(self, date):
-        """Read bee data for a specific date, remove stop words and repetitive phrases."""
+        """Read bee data for a specific date, compress with TextRank, remove stop words and repetitive phrases."""
         return self.read_data_for_date(date, 'BEE')
 
     def read_limitless_data_for_date(self, date):
-        """Read limitless data for a specific date, remove stop words and repetitive phrases."""
+        """Read limitless data for a specific date, compress with TextRank, remove stop words and repetitive phrases."""
         return self.read_data_for_date(date, 'LIMITLESS')
 
     def _get_files(self, directory):

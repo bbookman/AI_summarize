@@ -7,5 +7,6 @@
   "JOURNAL_PROMPT_FILE_NAME": "journal.md",
   "OUTPUT_DIR": "/Users/brucebookman/bruce_vault/Conversations/journal",
   "WEEKLY_PROMPTS": "weekly.md, simpsons.md",
-  "WEEKLY_RESULTS_PATH": "/Users/brucebookman/bruce_vault/Conversations/weekly"
+  "WEEKLY_RESULTS_PATH": "/Users/brucebookman/bruce_vault/Conversations/weekly",
+  "TEXT_RANK_COMPRESSION_RATIO": 0.3
 }

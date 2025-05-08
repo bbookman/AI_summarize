@@ -3,3 +3,6 @@ openai
 nltk
 schedule
 pytz
+scikit-learn
+numpy
+networkx
